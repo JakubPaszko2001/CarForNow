@@ -198,24 +198,25 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
                 <div key={field} className="relative">
                   <button
                     onClick={() => { setOpenDropdown(openDropdown === field ? null : field as any); setSearchQuery(""); }}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl"
+                    className="w-full flex items-center justify-between px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl transition-all"
                   >
-                    <span className={`text-xs font-black uppercase ${(field === "powerMin" ? pendingFilters.powerMin > minPower : pendingFilters.powerMax < maxPower) ? "text-[#e85d04]" : "text-zinc-500"}`}>
+                    <span className={`text-sm font-black uppercase ${(field === "powerMin" ? pendingFilters.powerMin > minPower : pendingFilters.powerMax < maxPower) ? "text-[#e85d04]" : "text-zinc-500"}`}>
                       {field === "powerMin" ? (pendingFilters.powerMin > minPower ? `${pendingFilters.powerMin} KM` : "OD") : (pendingFilters.powerMax < maxPower ? `${pendingFilters.powerMax} KM` : "DO")}
                     </span>
-                    <ChevronDownIcon className="w-4 h-4 text-[#e85d04]/60" />
+                    <ChevronDownIcon className="w-5 h-5 text-[#e85d04]/60" />
                   </button>
                   {openDropdown === field && (
-                    <div className="absolute left-0 right-0 mt-1 z-50 bg-white border border-zinc-200 rounded-2xl shadow-xl max-h-60 overflow-y-auto">
-                      <button onClick={() => handleSelect(field as any, "")} className="w-full text-left px-4 py-2 text-xs text-zinc-400 font-black uppercase">Wszystkie</button>
+                    <div className="absolute left-0 mt-2 z-50 bg-white border border-zinc-200 rounded-2xl shadow-2xl min-w-[150px] max-h-64 overflow-y-auto">
+                      <button onClick={() => handleSelect(field as any, "")} className="w-full text-left px-5 py-3 text-xs text-zinc-400 font-black uppercase border-b border-zinc-50">Wszystkie</button>
                       {getOptions(field as any).map((opt) => (
                         <button
                           key={opt}
                           onClick={() => handleSelect(field as any, opt)}
-                          className={`w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-zinc-50 transition-colors ${(field === "powerMin" ? pendingFilters.powerMin : pendingFilters.powerMax) === parseInt(opt)
-                              ? "text-[#e85d04]"
-                              : "text-zinc-700"
-                            }`}
+                          className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0 ${
+                            (field === "powerMin" ? pendingFilters.powerMin : pendingFilters.powerMax) === parseInt(opt) 
+                            ? "text-[#e85d04]" 
+                            : "text-zinc-700"
+                          }`}
                         >
                           {opt}
                         </button>
@@ -235,24 +236,25 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
                 <div key={field} className="relative">
                   <button
                     onClick={() => { setOpenDropdown(openDropdown === field ? null : field as any); setSearchQuery(""); }}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-2xl"
+                    className="w-full flex items-center justify-between px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl transition-all"
                   >
-                    <span className={`text-xs font-black uppercase ${(field === "capacityMin" ? pendingFilters.capacityMin > minCapacity : pendingFilters.capacityMax < maxCapacity) ? "text-[#e85d04]" : "text-zinc-500"}`}>
+                    <span className={`text-sm font-black uppercase ${(field === "capacityMin" ? pendingFilters.capacityMin > minCapacity : pendingFilters.capacityMax < maxCapacity) ? "text-[#e85d04]" : "text-zinc-500"}`}>
                       {field === "capacityMin" ? (pendingFilters.capacityMin > minCapacity ? `${pendingFilters.capacityMin} cm3` : "OD") : (pendingFilters.capacityMax < maxCapacity ? `${pendingFilters.capacityMax} cm3` : "DO")}
                     </span>
-                    <ChevronDownIcon className="w-4 h-4 text-[#e85d04]/60" />
+                    <ChevronDownIcon className="w-5 h-5 text-[#e85d04]/60" />
                   </button>
                   {openDropdown === field && (
-                    <div className="absolute left-0 right-0 mt-1 z-50 bg-white border border-zinc-200 rounded-2xl shadow-xl max-h-60 overflow-y-auto">
-                      <button onClick={() => handleSelect(field as any, "")} className="w-full text-left px-4 py-2 text-xs text-zinc-400 font-black uppercase">Wszystkie</button>
+                    <div className="absolute left-0 mt-2 z-50 bg-white border border-zinc-200 rounded-2xl shadow-2xl min-w-[150px] max-h-64 overflow-y-auto">
+                      <button onClick={() => handleSelect(field as any, "")} className="w-full text-left px-5 py-3 text-xs text-zinc-400 font-black uppercase border-b border-zinc-50">Wszystkie</button>
                       {getOptions(field as any).map((opt) => (
                         <button
                           key={opt}
                           onClick={() => handleSelect(field as any, opt)}
-                          className={`w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-zinc-50 transition-colors ${(field === "capacityMin" ? pendingFilters.capacityMin : pendingFilters.capacityMax) === parseInt(opt)
-                              ? "text-[#e85d04]"
-                              : "text-zinc-700"
-                            }`}
+                          className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0 ${
+                            (field === "capacityMin" ? pendingFilters.capacityMin : pendingFilters.capacityMax) === parseInt(opt) 
+                            ? "text-[#e85d04]" 
+                            : "text-zinc-700"
+                          }`}
                         >
                           {opt}
                         </button>
