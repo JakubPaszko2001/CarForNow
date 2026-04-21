@@ -24,8 +24,8 @@ export default function SegmentSelector() {
         {/* Kontener na segmenty */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-end">
           {SEGMENTS.map((segment) => (
-            <div 
-              key={segment.id} 
+            <div
+              key={segment.id}
               className="flex flex-col items-center group cursor-pointer"
             >
               {/* Miejsce na zdjęcie auta */}

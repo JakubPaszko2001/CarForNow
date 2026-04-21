@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { BoltIcon, ReceiptPercentIcon, KeyIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCars, Filters } from "@/app/context/CarsContext";
 
 type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3";
@@ -23,6 +23,24 @@ export default function HeroSection() {
   const [openDropdown, setOpenDropdown] = useState<DropdownField | null>(null);
   const [editingRange, setEditingRange] = useState<"power" | "year" | "price" | "capacity" | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const mobileRef = useRef<HTMLDivElement>(null);
+  const desktopRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const isOutsideMobile = mobileRef.current && !mobileRef.current.contains(event.target as Node);
+      const isOutsideDesktop = desktopRef.current && !desktopRef.current.contains(event.target as Node);
+      
+      // Jeśli jesteśmy w wersji mobile, sprawdzamy tylko mobileRef i vice versa
+      if (isOutsideMobile && isOutsideDesktop) {
+        setOpenDropdown(null);
+        setEditingRange(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const getOptions = (field: DropdownField | "powerMin" | "powerMax" | "capacityMin" | "capacityMax"): string[] => {
     const options = cars.flatMap((car) => {
@@ -118,7 +136,7 @@ export default function HeroSection() {
           <p className="text-zinc-400 text-sm font-medium tracking-wide">Najlepsze oferty wynajmu samochodów</p>
         </header>
 
-        <div className="w-full bg-[#121212]/80 backdrop-blur-xl border border-white/10 rounded-[40px] p-7 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]">
+        <div ref={mobileRef} className="w-full bg-[#121212]/80 backdrop-blur-xl border border-white/10 rounded-[40px] p-7 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]">
           <div className="flex flex-col gap-2">
             {(["brand", "model", "fuel", "transmission", "drive"] as DropdownField[]).map((field) => (
               <div key={field} className="relative">
@@ -276,7 +294,7 @@ export default function HeroSection() {
       <div className="relative z-10 hidden lg:flex min-h-screen w-full items-start pt-12 pb-10">
         <div className="w-full max-w-7xl mx-auto px-12 flex flex-col xl:flex-row items-center xl:items-start xl:gap-16">
           <div className="w-full max-w-md xl:max-w-none xl:w-[420px] flex-shrink-0 flex flex-col gap-6 text-center xl:text-left items-center xl:items-start">
-            <div className="w-full bg-[#121212]/80 backdrop-blur-xl border border-white/10 rounded-[32px] p-5 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]">
+            <div ref={desktopRef} className="w-full bg-[#121212]/80 backdrop-blur-xl border border-white/10 rounded-[32px] p-5 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]">
               <div className="flex flex-col gap-2 text-left">
                 {(["brand", "model", "fuel", "transmission", "drive"] as DropdownField[]).map((field) => (
                   <div key={field} className="relative">

@@ -26,12 +26,12 @@ export async function getScrapedCars() {
       const liTexts = $(el).find('ul li')
         .map((_, li) => $(li).text().replace(/\s+/g, ' ').trim()).get();
 
-      const paliwo   = liTexts[0] || '';
+      const paliwo = liTexts[0] || '';
       const skrzynia = liTexts[1] || '';
       const przebieg = liTexts[2] || '';
-      const silnik   = liTexts[3] || '';
-      const rokRaw   = liTexts[4] || '';
-      const rok      = parseInt(rokRaw.match(/\d{4}/)?.[0] || '2023');
+      const silnik = liTexts[3] || '';
+      const rokRaw = liTexts[4] || '';
+      const rok = parseInt(rokRaw.match(/\d{4}/)?.[0] || '2023');
 
       // CENA
       const cenaRaw = $(el).find('strong').filter((_, e) =>
@@ -44,18 +44,18 @@ export async function getScrapedCars() {
       const link = rawLink.replace('../auto/', '/auto/').replace(/\/$/, '');
 
       cars.push({
-        brand:        brand || 'Auto',
-        model:        modelParts.join(' ') || 'Oferta',
-        version:      opis,
-        fuel:         paliwo,
+        brand: brand || 'Auto',
+        model: modelParts.join(' ') || 'Oferta',
+        version: opis,
+        fuel: paliwo,
         transmission: skrzynia,
-        drive:        'FWD',
-        power:        silnik,
-        year:         rok,
+        drive: 'FWD',
+        power: silnik,
+        year: rok,
         price,
         image,
-        brandLogo:    `/${(brand || 'auto').toLowerCase()}Logo.png`,
-        tag:          'Dostępny',
+        brandLogo: `/${(brand || 'auto').toLowerCase()}Logo.png`,
+        tag: 'Dostępny',
         przebieg,
         link,
       });
