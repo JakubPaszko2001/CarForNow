@@ -5,11 +5,13 @@ import { XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useCars, Filters } from "@/app/context/CarsContext";
 import gsap from "gsap";
 
-type DropdownField = keyof Omit<Filters, "priceMin" | "priceMax" | "yearMin" | "yearMax" | "powerMin" | "powerMax">;
+type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3";
 
 const FIELD_LABELS: Record<DropdownField, string> = {
   brand: "Marka",
   model: "Model",
+  powerKM: "Moc (KM)",
+  capacityCM3: "Pojemność (cm3)",
   fuel: "Paliwo",
   transmission: "Skrzynia biegów",
   drive: "Napęd",
@@ -29,21 +31,57 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const getOptions = (field: DropdownField): string[] => {
-    const filtered = cars.filter((car) => {
-      const matchesSearch = !searchQuery || String(car[field]).toLowerCase().startsWith(searchQuery.toLowerCase());
-      if (!matchesSearch) return false;
+    const options = cars.flatMap((car) => {
+      const parts = String(car.power).split("/").map(p => p.trim());
+      if (field === "powerKM" || field === "powerMin" || field === "powerMax") {
+        return parts.filter(p => p.toLowerCase().includes("km"));
+      }
+      if (field === "capacityCM3" || field === "capacityMin" || field === "capacityMax") {
+        return parts.filter(p => p.toLowerCase().includes("cm3"));
+      }
+      return [String(car[field as keyof Car])];
+    }).filter(Boolean);
 
-      return (Object.keys(FIELD_LABELS) as DropdownField[]).every((f) => {
-        if (f === field) return true;
-        if (!pendingFilters[f]) return true;
-        return String(car[f]) === pendingFilters[f];
-      });
+    const uniqueOptions = [...new Set(options)];
+    const filteredOptions = uniqueOptions.filter(opt => {
+      if (!searchQuery) return true;
+      return opt.toLowerCase().includes(searchQuery.toLowerCase());
     });
-    return [...new Set(filtered.map((car) => String(car[field])).filter(Boolean))].sort();
+
+    return filteredOptions.sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ""));
+      const numB = parseInt(b.replace(/\D/g, ""));
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
   };
 
   const handleSelect = (field: DropdownField, value: string) => {
-    setPendingFilters({ ...pendingFilters, [field]: value });
+    const newFilters = { ...pendingFilters, [field]: value };
+
+    // Sync numeric ranges if selecting a power string
+    if (value !== "") {
+      const num = parseInt(value.replace(/\D/g, ""));
+      if (!isNaN(num)) {
+        if (field === "powerKM") {
+          newFilters.powerMin = num;
+          newFilters.powerMax = num;
+        } else if (field === "capacityCM3") {
+          newFilters.capacityMin = num;
+          newFilters.capacityMax = num;
+        }
+      }
+    } else {
+      if (field === "powerKM") {
+        newFilters.powerMin = 0;
+        newFilters.powerMax = 1000;
+      } else if (field === "capacityCM3") {
+        newFilters.capacityMin = 0;
+        newFilters.capacityMax = 5000;
+      }
+    }
+
+    setPendingFilters(newFilters);
     setOpenDropdown(null);
   };
 
@@ -159,7 +197,7 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
 
               {openDropdown === field && (
                 <div className="mt-1 border border-zinc-200 bg-white rounded-2xl overflow-hidden max-h-64 overflow-y-auto shadow-lg">
-                  {(field === "brand" || field === "model") && (
+                  {(field === "brand" || field === "model" || field === "powerKM" || field === "capacityCM3") && (
                     <div className="p-2 sticky top-0 bg-white border-b border-zinc-100 z-10">
                       <input
                         type="text"
@@ -181,9 +219,8 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
                     <button
                       key={option}
                       onClick={() => handleSelect(field, option)}
-                      className={`w-full text-left px-5 py-3 text-xs font-black uppercase tracking-widest hover:bg-zinc-50 transition-colors border-t border-zinc-100 ${
-                        pendingFilters[field] === option ? "text-[#e85d04]" : "text-zinc-700"
-                      }`}
+                      className={`w-full text-left px-5 py-3 text-xs font-black uppercase tracking-widest hover:bg-zinc-50 transition-colors border-t border-zinc-100 ${pendingFilters[field] === option ? "text-[#e85d04]" : "text-zinc-700"
+                        }`}
                     >
                       {option}
                     </button>
@@ -193,80 +230,13 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
             </div>
           ))}
 
-          {/* Slider mocy */}
-          <div className="bg-zinc-50 border border-zinc-200 rounded-2xl px-5 py-4">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-[10px] text-zinc-400 uppercase font-black tracking-widest">Moc</span>
-              <div className="relative">
-                <span 
-                  onClick={() => setEditingRange("power")}
-                  className="text-[#e85d04] text-xs font-black cursor-pointer hover:bg-zinc-100 px-2 py-1 rounded-lg transition-colors"
-                >
-                  {pendingFilters.powerMin} — {pendingFilters.powerMax} KM
-                </span>
-                {editingRange === "power" && (
-                  <div className="absolute right-0 top-full mt-2 z-[60] bg-white border border-zinc-200 rounded-3xl p-5 shadow-[0_30px_60px_rgba(0,0,0,0.15)] flex flex-col gap-4 min-w-[220px]">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex flex-col gap-1.5 w-full">
-                        <span className="text-[10px] text-zinc-500 uppercase font-black">Od</span>
-                        <input
-                          type="number"
-                          value={pendingFilters.powerMin}
-                          onChange={(e) => setPendingFilters({ ...pendingFilters, powerMin: Number(e.target.value) })}
-                          onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                          autoFocus
-                          className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2.5 text-xs text-zinc-900 focus:outline-none focus:border-[#e85d04]/50"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1.5 w-full">
-                        <span className="text-[10px] text-zinc-500 uppercase font-black">Do</span>
-                        <input
-                          type="number"
-                          value={pendingFilters.powerMax}
-                          onChange={(e) => setPendingFilters({ ...pendingFilters, powerMax: Number(e.target.value) })}
-                          onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                          className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2.5 text-xs text-zinc-900 focus:outline-none focus:border-[#e85d04]/50"
-                        />
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => setEditingRange(null)}
-                      className="w-full bg-[#e85d04] text-white text-[10px] font-black uppercase py-2.5 rounded-xl hover:bg-[#ff6d0a] shadow-lg shadow-[#e85d04]/20"
-                    >
-                      Zastosuj
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] text-zinc-400 w-4">od</span>
-                <input
-                  type="range" min={minPower} max={maxPower}
-                  value={pendingFilters.powerMin}
-                  onChange={(e) => setPendingFilters({ ...pendingFilters, powerMin: Number(e.target.value) })}
-                  className="w-full accent-[#e85d04]"
-                />
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] text-zinc-400 w-4">do</span>
-                <input
-                  type="range" min={minPower} max={maxPower}
-                  value={pendingFilters.powerMax}
-                  onChange={(e) => setPendingFilters({ ...pendingFilters, powerMax: Number(e.target.value) })}
-                  className="w-full accent-[#e85d04]"
-                />
-              </div>
-            </div>
-          </div>
 
           {/* Slider roku */}
           <div className="bg-zinc-50 border border-zinc-200 rounded-2xl px-5 py-4">
             <div className="flex justify-between items-center mb-4">
               <span className="text-[10px] text-zinc-400 uppercase font-black tracking-widest">Rok</span>
               <div className="relative">
-                <span 
+                <span
                   onClick={() => setEditingRange("year")}
                   className="text-[#e85d04] text-xs font-black cursor-pointer hover:bg-zinc-100 px-2 py-1 rounded-lg transition-colors"
                 >
@@ -297,7 +267,7 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
                         />
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setEditingRange(null)}
                       className="w-full bg-[#e85d04] text-white text-[10px] font-black uppercase py-2.5 rounded-xl hover:bg-[#ff6d0a] shadow-lg shadow-[#e85d04]/20"
                     >
@@ -334,7 +304,7 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
             <div className="flex justify-between items-center mb-4">
               <span className="text-[10px] text-zinc-400 uppercase font-black tracking-widest">Cena</span>
               <div className="relative">
-                <span 
+                <span
                   onClick={() => setEditingRange("price")}
                   className="text-[#e85d04] text-xs font-black cursor-pointer hover:bg-zinc-100 px-2 py-1 rounded-lg transition-colors"
                 >
@@ -365,7 +335,7 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
                         />
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setEditingRange(null)}
                       className="w-full bg-[#e85d04] text-white text-[10px] font-black uppercase py-2.5 rounded-xl hover:bg-[#ff6d0a] shadow-lg shadow-[#e85d04]/20"
                     >

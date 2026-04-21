@@ -6,11 +6,13 @@ import { BoltIcon, ReceiptPercentIcon, KeyIcon } from "@heroicons/react/24/outli
 import { useState } from "react";
 import { useCars, Filters } from "@/app/context/CarsContext";
 
-type DropdownField = keyof Omit<Filters, "priceMin" | "priceMax" | "yearMin" | "yearMax" | "powerMin" | "powerMax">;
+type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3";
 
 const FIELD_LABELS: Record<DropdownField, string> = {
   brand: "Marka",
   model: "Model",
+  powerKM: "Moc (KM)",
+  capacityCM3: "Pojemność (cm3)",
   fuel: "Paliwo",
   transmission: "Skrzynia biegów",
   drive: "Napęd",
@@ -23,21 +25,58 @@ export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const getOptions = (field: DropdownField): string[] => {
-    const filtered = cars.filter((car) => {
-      const matchesSearch = !searchQuery || String(car[field]).toLowerCase().startsWith(searchQuery.toLowerCase());
-      if (!matchesSearch) return false;
+    const options = cars.flatMap((car) => {
+      const parts = String(car.power).split("/").map(p => p.trim());
+      if (field === "powerKM" || field === "powerMin" || field === "powerMax") {
+        return parts.filter(p => p.toLowerCase().includes("km"));
+      }
+      if (field === "capacityCM3" || field === "capacityMin" || field === "capacityMax") {
+        return parts.filter(p => p.toLowerCase().includes("cm3"));
+      }
+      return [String(car[field as keyof Car])];
+    }).filter(Boolean);
 
-      return (Object.keys(FIELD_LABELS) as DropdownField[]).every((f) => {
-        if (f === field) return true;
-        if (!pendingFilters[f]) return true;
-        return String(car[f]) === pendingFilters[f];
-      });
+    const uniqueOptions = [...new Set(options)];
+    const filteredOptions = uniqueOptions.filter(opt => {
+      if (!searchQuery) return true;
+      return opt.toLowerCase().includes(searchQuery.toLowerCase());
     });
-    return [...new Set(filtered.map((car) => String(car[field])).filter(Boolean))].sort();
+
+    return filteredOptions.sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ""));
+      const numB = parseInt(b.replace(/\D/g, ""));
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
   };
 
   const handleSelect = (field: DropdownField, value: string) => {
-    setPendingFilters({ ...pendingFilters, [field]: value });
+    const newFilters = { ...pendingFilters, [field]: value };
+    
+    // Sync numeric ranges if selecting a power string
+    if (value !== "") {
+      const num = parseInt(value.replace(/\D/g, ""));
+      if (!isNaN(num)) {
+        if (field === "powerKM") {
+          newFilters.powerMin = num;
+          newFilters.powerMax = num;
+        } else if (field === "capacityCM3") {
+          newFilters.capacityMin = num;
+          newFilters.capacityMax = num;
+        }
+      }
+    } else {
+      // Reset numeric ranges if clearing
+      if (field === "powerKM") {
+        newFilters.powerMin = minPower;
+        newFilters.powerMax = maxPower;
+      } else if (field === "capacityCM3") {
+        newFilters.capacityMin = minCapacity;
+        newFilters.capacityMax = maxCapacity;
+      }
+    }
+
+    setPendingFilters(newFilters);
     setOpenDropdown(null);
   };
 
@@ -108,7 +147,7 @@ export default function HeroSection() {
 
         <div className="w-full bg-[#121212]/80 backdrop-blur-xl border border-white/10 rounded-[40px] p-7 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]">
           <div className="flex flex-col gap-2">
-            {(Object.keys(FIELD_LABELS) as DropdownField[]).map((field) => (
+            {(["brand", "model", "fuel", "transmission", "drive"] as DropdownField[]).map((field) => (
               <div key={field} className="relative">
                 <button
                   onClick={() => {
@@ -116,14 +155,14 @@ export default function HeroSection() {
                     setSearchQuery("");
                   }}
                   className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60"
-                    : pendingFilters[field] ? "bg-white/8 border-[#e85d04]/30"
+                    : pendingFilters[field as keyof Filters] ? "bg-white/8 border-[#e85d04]/30"
                       : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
                     }`}
                 >
                   <div className="flex flex-col items-start gap-0.5">
                     <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">{FIELD_LABELS[field]}</span>
-                    <span className={`text-sm font-black uppercase tracking-wide ${pendingFilters[field] ? "text-[#e85d04]" : "text-zinc-300"}`}>
-                      {pendingFilters[field] || "Wszystkie"}
+                    <span className={`text-sm font-black uppercase tracking-wide ${pendingFilters[field as keyof Filters] ? "text-[#e85d04]" : "text-zinc-300"}`}>
+                      {pendingFilters[field as keyof Filters] || "Wszystkie"}
                     </span>
                   </div>
                   <ChevronDownIcon className={`w-5 h-5 text-[#e85d04] transition-transform duration-200 ${openDropdown === field ? "rotate-180" : ""}`} />
@@ -145,7 +184,7 @@ export default function HeroSection() {
                     <button onClick={() => { handleSelect(field, ""); setSearchQuery(""); }} className="w-full text-left px-5 py-3.5 text-zinc-500 hover:bg-white/8 text-xs font-black uppercase tracking-widest transition-colors border-b border-white/5">Wszystkie</button>
                     {getOptions(field).map((option) => (
                       <button key={option} onClick={() => handleSelect(field, option)}
-                        className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase tracking-widest hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${pendingFilters[field] === option ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>
+                        className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase tracking-widest hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${pendingFilters[field as keyof Filters] === option ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>
                         {option}
                       </button>
                     ))}
@@ -153,113 +192,78 @@ export default function HeroSection() {
                 )}
               </div>
             ))}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 mt-1">
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Moc</span>
-                    <span className="text-sm font-black uppercase tracking-wide text-zinc-300">KM</span>
-                  </div>
-                  <div className="relative">
-                    <span
-                      onClick={() => setEditingRange("power")}
-                      className="text-[#e85d04] text-xs font-black cursor-pointer hover:bg-white/5 px-2 py-1 rounded-lg transition-colors"
-                    >
-                      {pendingFilters.powerMin} — {pendingFilters.powerMax} KM
-                    </span>
-                    {editingRange === "power" && (
-                      <div className="absolute right-0 top-full mt-2 z-[60] bg-[#1a1a1a] border border-[#e85d04]/40 rounded-3xl p-6 shadow-[0_30px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl flex flex-col gap-4 min-w-[240px]">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[9px] text-zinc-500 uppercase font-black">Od</span>
-                            <input
-                              type="number"
-                              value={pendingFilters.powerMin}
-                              onChange={(e) => setPendingFilters({ ...pendingFilters, powerMin: Number(e.target.value) })}
-                              onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                              autoFocus
-                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#e85d04]/50"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[9px] text-zinc-500 uppercase font-black">Do</span>
-                            <input
-                              type="number"
-                              value={pendingFilters.powerMax}
-                              onChange={(e) => setPendingFilters({ ...pendingFilters, powerMax: Number(e.target.value) })}
-                              onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#e85d04]/50"
-                            />
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setEditingRange(null)}
-                          className="w-full bg-[#e85d04] text-white text-[10px] font-black uppercase py-2 rounded-lg hover:bg-[#ff6d0a] transition-colors"
-                        >
-                          Zastosuj
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <input type="range" min={minPower} max={maxPower} value={pendingFilters.powerMin} onChange={(e) => setPendingFilters({ ...pendingFilters, powerMin: Number(e.target.value) })} className="w-full accent-[#e85d04]" />
-                  <input type="range" min={minPower} max={maxPower} value={pendingFilters.powerMax} onChange={(e) => setPendingFilters({ ...pendingFilters, powerMax: Number(e.target.value) })} className="w-full accent-[#e85d04]" />
-                </div>
-              </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 mt-1">
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Pojemność</span>
-                    <span className="text-sm font-black uppercase tracking-wide text-zinc-300">cm3</span>
-                  </div>
-                  <div className="relative">
-                    <span
-                      onClick={() => setEditingRange("capacity")}
-                      className="text-[#e85d04] text-xs font-black cursor-pointer hover:bg-white/5 px-2 py-1 rounded-lg transition-colors"
+            {/* 2. MOC (KM) - JEDNA LINIA, DWA INPUTY */}
+            <div className="flex flex-col gap-1.5 mb-3">
+              <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">Moc (KM)</span>
+              <div className="grid grid-cols-2 gap-2">
+                {["powerMin", "powerMax"].map((field) => (
+                  <div key={field} className="relative">
+                    <button
+                      onClick={() => {
+                        setOpenDropdown(openDropdown === field ? null : field as DropdownField);
+                        setSearchQuery("");
+                      }}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60"
+                        : (field === "powerMin" ? pendingFilters.powerMin > minPower : pendingFilters.powerMax < maxPower) ? "bg-white/8 border-[#e85d04]/30"
+                          : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
+                        }`}
                     >
-                      {pendingFilters.capacityMin} — {pendingFilters.capacityMax}
-                    </span>
-                    {editingRange === "capacity" && (
-                      <div className="absolute right-0 top-full mt-2 z-[60] bg-[#1a1a1a] border border-[#e85d04]/40 rounded-3xl p-6 shadow-[0_30px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl flex flex-col gap-4 min-w-[240px]">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[9px] text-zinc-500 uppercase font-black">Od</span>
-                            <input
-                              type="number"
-                              value={pendingFilters.capacityMin}
-                              onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMin: Number(e.target.value) })}
-                              onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                              autoFocus
-                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#e85d04]/50"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[9px] text-zinc-500 uppercase font-black">Do</span>
-                            <input
-                              type="number"
-                              value={pendingFilters.capacityMax}
-                              onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMax: Number(e.target.value) })}
-                              onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#e85d04]/50"
-                            />
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setEditingRange(null)}
-                          className="w-full bg-[#e85d04] text-white text-[10px] font-black uppercase py-2 rounded-lg hover:bg-[#ff6d0a] transition-colors"
-                        >
-                          Zastosuj
-                        </button>
+                      <span className={`text-xs font-black uppercase tracking-wide ${(field === "powerMin" ? pendingFilters.powerMin > minPower : pendingFilters.powerMax < maxPower) ? "text-[#e85d04]" : "text-zinc-400"}`}>
+                        {field === "powerMin" ? (pendingFilters.powerMin > minPower ? `${pendingFilters.powerMin} KM` : "OD") : (pendingFilters.powerMax < maxPower ? `${pendingFilters.powerMax} KM` : "DO")}
+                      </span>
+                      <ChevronDownIcon className={`w-4 h-4 text-[#e85d04]/60 transition-transform duration-200 ${openDropdown === field ? "rotate-180" : ""}`} />
+                    </button>
+                    {openDropdown === field && (
+                      <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-[#1e1e1e] border border-white/15 rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.6)] max-h-60 overflow-y-auto">
+                        <button onClick={() => handleSelect(field as DropdownField, "")} className="w-full text-left px-5 py-3 text-zinc-500 hover:bg-white/8 text-[10px] font-black uppercase transition-colors border-b border-white/5">Wszystkie</button>
+                        {getOptions(field as DropdownField).map((option) => (
+                          <button key={option} onClick={() => handleSelect(field as DropdownField, option)}
+                            className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(field === "powerMin" ? pendingFilters.powerMin === Number(option) : pendingFilters.powerMax === Number(option)) ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>
+                            {option}
+                          </button>
+                        ))}
                       </div>
                     )}
                   </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <input type="range" min={minCapacity} max={maxCapacity} value={pendingFilters.capacityMin} onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMin: Number(e.target.value) })} className="w-full accent-[#e85d04]" />
-                  <input type="range" min={minCapacity} max={maxCapacity} value={pendingFilters.capacityMax} onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMax: Number(e.target.value) })} className="w-full accent-[#e85d04]" />
-                </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. POJEMNOŚĆ (cm3) - JEDNA LINIA, DWA INPUTY */}
+            <div className="flex flex-col gap-1.5 mb-3">
+              <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest px-1">Pojemność (cm3)</span>
+              <div className="grid grid-cols-2 gap-2">
+                {["capacityMin", "capacityMax"].map((field) => (
+                  <div key={field} className="relative">
+                    <button
+                      onClick={() => {
+                        setOpenDropdown(openDropdown === field ? null : field as DropdownField);
+                        setSearchQuery("");
+                      }}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60"
+                        : (field === "capacityMin" ? pendingFilters.capacityMin > minCapacity : pendingFilters.capacityMax < maxCapacity) ? "bg-white/8 border-[#e85d04]/30"
+                          : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
+                        }`}
+                    >
+                      <span className={`text-xs font-black uppercase tracking-wide ${(field === "capacityMin" ? pendingFilters.capacityMin > minCapacity : pendingFilters.capacityMax < maxCapacity) ? "text-[#e85d04]" : "text-zinc-400"}`}>
+                        {field === "capacityMin" ? (pendingFilters.capacityMin > minCapacity ? `${pendingFilters.capacityMin} cm3` : "OD") : (pendingFilters.capacityMax < maxCapacity ? `${pendingFilters.capacityMax} cm3` : "DO")}
+                      </span>
+                      <ChevronDownIcon className={`w-4 h-4 text-[#e85d04]/60 transition-transform duration-200 ${openDropdown === field ? "rotate-180" : ""}`} />
+                    </button>
+                    {openDropdown === field && (
+                      <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-[#1e1e1e] border border-white/15 rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.6)] max-h-60 overflow-y-auto">
+                        <button onClick={() => handleSelect(field as DropdownField, "")} className="w-full text-left px-5 py-3 text-zinc-500 hover:bg-white/8 text-[10px] font-black uppercase transition-colors border-b border-white/5">Wszystkie</button>
+                        {getOptions(field as DropdownField).map((option) => (
+                          <button key={option} onClick={() => handleSelect(field as DropdownField, option)}
+                            className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(field === "capacityMin" ? pendingFilters.capacityMin === Number(option) : pendingFilters.capacityMax === Number(option)) ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -406,7 +410,7 @@ export default function HeroSection() {
           <div className="w-full max-w-md xl:max-w-none xl:w-[420px] flex-shrink-0 flex flex-col gap-6 text-center xl:text-left items-center xl:items-start">
             <div className="w-full bg-[#121212]/80 backdrop-blur-xl border border-white/10 rounded-[32px] p-5 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]">
               <div className="flex flex-col gap-2 text-left">
-                {(Object.keys(FIELD_LABELS) as DropdownField[]).map((field) => (
+                {(["brand", "model", "fuel", "transmission", "drive"] as DropdownField[]).map((field) => (
                   <div key={field} className="relative">
                     <button
                       onClick={() => {
@@ -414,14 +418,14 @@ export default function HeroSection() {
                         setSearchQuery("");
                       }}
                       className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60"
-                        : pendingFilters[field] ? "bg-white/8 border-[#e85d04]/30"
+                        : pendingFilters[field as keyof Filters] ? "bg-white/8 border-[#e85d04]/30"
                           : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
                         }`}
                     >
                       <div className="flex flex-col items-start gap-0.5">
                         <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest">{FIELD_LABELS[field]}</span>
-                        <span className={`text-xs font-black uppercase tracking-wide ${pendingFilters[field] ? "text-[#e85d04]" : "text-zinc-300"}`}>
-                          {pendingFilters[field] || "Wszystkie"}
+                        <span className={`text-xs font-black uppercase tracking-wide ${pendingFilters[field as keyof Filters] ? "text-[#e85d04]" : "text-zinc-300"}`}>
+                          {pendingFilters[field as keyof Filters] || "Wszystkie"}
                         </span>
                       </div>
                       <ChevronDownIcon className={`w-4 h-4 text-[#e85d04] transition-transform duration-200 ${openDropdown === field ? "rotate-180" : ""}`} />
@@ -443,7 +447,7 @@ export default function HeroSection() {
                         <button onClick={() => { handleSelect(field, ""); setSearchQuery(""); }} className="w-full text-left px-4 py-2.5 text-zinc-500 hover:bg-white/8 text-[11px] font-black uppercase tracking-widest transition-colors border-b border-white/5">Wszystkie</button>
                         {getOptions(field).map((option) => (
                           <button key={option} onClick={() => handleSelect(field, option)}
-                            className={`w-full text-left px-4 py-2.5 text-[11px] font-black uppercase tracking-widest hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${pendingFilters[field] === option ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>
+                            className={`w-full text-left px-4 py-2.5 text-[11px] font-black uppercase tracking-widest hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${pendingFilters[field as keyof Filters] === option ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>
                             {option}
                           </button>
                         ))}
@@ -451,112 +455,80 @@ export default function HeroSection() {
                     )}
                   </div>
                 ))}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest">Moc</span>
-                        <span className="text-xs font-black uppercase tracking-wide text-zinc-300">KM</span>
-                      </div>
-                      <div className="relative">
-                        <span
-                          onClick={() => setEditingRange("power")}
-                          className="text-[#e85d04] text-[10px] font-black cursor-pointer hover:bg-white/5 px-1.5 py-0.5 rounded-md transition-colors"
-                        >
-                          {pendingFilters.powerMin} — {pendingFilters.powerMax}
-                        </span>
-                        {editingRange === "power" && (
-                          <div className="absolute right-0 top-full mt-2 z-[60] bg-[#1a1a1a] border border-[#e85d04]/40 rounded-3xl p-5 shadow-[0_30px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl flex flex-col gap-4 min-w-[220px]">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex flex-col gap-1.5 w-full">
-                                <span className="text-[10px] text-zinc-500 uppercase font-black">Od</span>
-                                <input
-                                  type="number"
-                                  value={pendingFilters.powerMin}
-                                  onChange={(e) => setPendingFilters({ ...pendingFilters, powerMin: Number(e.target.value) })}
-                                  onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                                  autoFocus
-                                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#e85d04]/50"
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1.5 w-full">
-                                <span className="text-[10px] text-zinc-500 uppercase font-black">Do</span>
-                                <input
-                                  type="number"
-                                  value={pendingFilters.powerMax}
-                                  onChange={(e) => setPendingFilters({ ...pendingFilters, powerMax: Number(e.target.value) })}
-                                  onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#e85d04]/50"
-                                />
-                              </div>
+
+                {/* ROW: MOC & POJEMNOŚĆ (OBOK SIEBIE) */}
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  {/* MOC (KM) */}
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest px-1">Moc (KM)</span>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {["powerMin", "powerMax"].map((field) => (
+                        <div key={field} className="relative">
+                          <button
+                            onClick={() => {
+                              setOpenDropdown(openDropdown === field ? null : field as DropdownField);
+                              setSearchQuery("");
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60"
+                              : (field === "powerMin" ? pendingFilters.powerMin > minPower : pendingFilters.powerMax < maxPower) ? "bg-white/8 border-[#e85d04]/30"
+                                : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
+                              }`}
+                          >
+                            <span className={`text-[11px] font-black uppercase tracking-wide ${(field === "powerMin" ? pendingFilters.powerMin > minPower : pendingFilters.powerMax < maxPower) ? "text-[#e85d04]" : "text-zinc-400"}`}>
+                              {field === "powerMin" ? (pendingFilters.powerMin > minPower ? `${pendingFilters.powerMin}` : "OD") : (pendingFilters.powerMax < maxPower ? `${pendingFilters.powerMax}` : "DO")}
+                            </span>
+                            <ChevronDownIcon className={`w-3.5 h-3.5 text-[#e85d04]/60 transition-transform duration-200 ${openDropdown === field ? "rotate-180" : ""}`} />
+                          </button>
+                          {openDropdown === field && (
+                            <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-[#1e1e1e] border border-white/15 rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.6)] max-h-52 overflow-y-auto">
+                              <button onClick={() => handleSelect(field as DropdownField, "")} className="w-full text-left px-4 py-2.5 text-zinc-500 hover:bg-white/8 text-[10px] font-black uppercase transition-colors border-b border-white/5">Wszystkie</button>
+                              {getOptions(field as DropdownField).map((option) => (
+                                <button key={option} onClick={() => handleSelect(field as DropdownField, option)}
+                                  className={`w-full text-left px-4 py-2.5 text-[10px] font-black uppercase hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(field === "powerMin" ? pendingFilters.powerMin === Number(option) : pendingFilters.powerMax === Number(option)) ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>
+                                  {option} KM
+                                </button>
+                              ))}
                             </div>
-                            <button
-                              onClick={() => setEditingRange(null)}
-                              className="w-full bg-[#e85d04] text-white text-[10px] font-black uppercase py-2.5 rounded-xl hover:bg-[#ff6d0a] shadow-lg shadow-[#e85d04]/20"
-                            >
-                              Zastosuj
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <input type="range" min={minPower} max={maxPower} value={pendingFilters.powerMin} onChange={(e) => setPendingFilters({ ...pendingFilters, powerMin: Number(e.target.value) })} className="w-full accent-[#e85d04]" />
-                      <input type="range" min={minPower} max={maxPower} value={pendingFilters.powerMax} onChange={(e) => setPendingFilters({ ...pendingFilters, powerMax: Number(e.target.value) })} className="w-full accent-[#e85d04]" />
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  <div className="bg-white/5 border border-white/10 rounded-xl px-3.5 py-3">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest">Poj.</span>
-                        <span className="text-xs font-black uppercase tracking-wide text-zinc-300">cm3</span>
-                      </div>
-                      <div className="relative">
-                        <span
-                          onClick={() => setEditingRange("capacity")}
-                          className="text-[#e85d04] text-[10px] font-black cursor-pointer hover:bg-white/5 px-1.5 py-0.5 rounded-md transition-colors"
-                        >
-                          {pendingFilters.capacityMin} — {pendingFilters.capacityMax}
-                        </span>
-                        {editingRange === "capacity" && (
-                          <div className="absolute right-0 top-full mt-2 z-[60] bg-[#1a1a1a] border border-[#e85d04]/40 rounded-3xl p-5 shadow-[0_30px_60px_rgba(0,0,0,0.8)] backdrop-blur-2xl flex flex-col gap-4 min-w-[220px]">
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex flex-col gap-1.5 w-full">
-                                <span className="text-[10px] text-zinc-500 uppercase font-black">Od</span>
-                                <input
-                                  type="number"
-                                  value={pendingFilters.capacityMin}
-                                  onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMin: Number(e.target.value) })}
-                                  onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                                  autoFocus
-                                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#e85d04]/50"
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1.5 w-full">
-                                <span className="text-[10px] text-zinc-500 uppercase font-black">Do</span>
-                                <input
-                                  type="number"
-                                  value={pendingFilters.capacityMax}
-                                  onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMax: Number(e.target.value) })}
-                                  onKeyDown={(e) => e.key === "Enter" && setEditingRange(null)}
-                                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#e85d04]/50"
-                                />
-                              </div>
+                  {/* POJEMNOŚĆ (cm3) */}
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest px-1">Pojemność (cm3)</span>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {["capacityMin", "capacityMax"].map((field) => (
+                        <div key={field} className="relative">
+                          <button
+                            onClick={() => {
+                              setOpenDropdown(openDropdown === field ? null : field as DropdownField);
+                              setSearchQuery("");
+                            }}
+                            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60"
+                              : (field === "capacityMin" ? pendingFilters.capacityMin > minCapacity : pendingFilters.capacityMax < maxCapacity) ? "bg-white/8 border-[#e85d04]/30"
+                                : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"
+                              }`}
+                          >
+                            <span className={`text-[11px] font-black uppercase tracking-wide ${(field === "capacityMin" ? pendingFilters.capacityMin > minCapacity : pendingFilters.capacityMax < maxCapacity) ? "text-[#e85d04]" : "text-zinc-400"}`}>
+                              {field === "capacityMin" ? (pendingFilters.capacityMin > minCapacity ? `${pendingFilters.capacityMin}` : "OD") : (pendingFilters.capacityMax < maxCapacity ? `${pendingFilters.capacityMax}` : "DO")}
+                            </span>
+                            <ChevronDownIcon className={`w-3.5 h-3.5 text-[#e85d04]/60 transition-transform duration-200 ${openDropdown === field ? "rotate-180" : ""}`} />
+                          </button>
+                          {openDropdown === field && (
+                            <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-[#1e1e1e] border border-white/15 rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.6)] max-h-52 overflow-y-auto">
+                              <button onClick={() => handleSelect(field as DropdownField, "")} className="w-full text-left px-4 py-2.5 text-zinc-500 hover:bg-white/8 text-[10px] font-black uppercase transition-colors border-b border-white/5">Wszystkie</button>
+                              {getOptions(field as DropdownField).map((option) => (
+                                <button key={option} onClick={() => handleSelect(field as DropdownField, option)}
+                                  className={`w-full text-left px-4 py-2.5 text-[10px] font-black uppercase hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(field === "capacityMin" ? pendingFilters.capacityMin === Number(option) : pendingFilters.capacityMax === Number(option)) ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>
+                                  {option} cm3
+                                </button>
+                              ))}
                             </div>
-                            <button
-                              onClick={() => setEditingRange(null)}
-                              className="w-full bg-[#e85d04] text-white text-[10px] font-black uppercase py-2.5 rounded-xl hover:bg-[#ff6d0a] shadow-lg shadow-[#e85d04]/20"
-                            >
-                              Zastosuj
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <input type="range" min={minCapacity} max={maxCapacity} value={pendingFilters.capacityMin} onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMin: Number(e.target.value) })} className="w-full accent-[#e85d04]" />
-                      <input type="range" min={minCapacity} max={maxCapacity} value={pendingFilters.capacityMax} onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMax: Number(e.target.value) })} className="w-full accent-[#e85d04]" />
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>

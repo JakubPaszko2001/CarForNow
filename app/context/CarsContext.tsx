@@ -20,6 +20,8 @@ export type Filters = {
   powerMax: number;
   capacityMin: number;
   capacityMax: number;
+  powerKM: string;
+  capacityCM3: string;
 };
 
 export type SortOption =
@@ -67,6 +69,8 @@ const defaultFilters: Filters = {
   powerMax: 1000,
   capacityMin: 0,
   capacityMax: 5000,
+  powerKM: "",
+  capacityCM3: "",
 };
 
 const CarsContext = createContext<CarsContextType>({
@@ -74,9 +78,9 @@ const CarsContext = createContext<CarsContextType>({
   loading: true,
   filters: defaultFilters,
   pendingFilters: defaultFilters,
-  setPendingFilters: () => {},
-  applyFilters: () => {},
-  clearFilters: () => {},
+  setPendingFilters: () => { },
+  applyFilters: () => { },
+  clearFilters: () => { },
   filteredCars: [],
   maxPrice: 99999,
   minYear: 1900,
@@ -86,7 +90,7 @@ const CarsContext = createContext<CarsContextType>({
   minCapacity: 0,
   maxCapacity: 5000,
   sortOption: null,
-  setSortOption: () => {},
+  setSortOption: () => { },
 });
 
 const getPowerKM = (powerStr: string) => {
@@ -199,6 +203,10 @@ export function CarsProvider({ children }: { children: ReactNode }) {
       if (powerValue < filters.powerMin || powerValue > filters.powerMax) return false;
       const capacityValue = getCapacity(car.power);
       if (capacityValue < filters.capacityMin || capacityValue > filters.capacityMax) return false;
+
+      if (filters.powerKM && !String(car.power).includes(filters.powerKM)) return false;
+      if (filters.capacityCM3 && !String(car.power).includes(filters.capacityCM3)) return false;
+
       return true;
     });
 
@@ -206,13 +214,13 @@ export function CarsProvider({ children }: { children: ReactNode }) {
 
     return [...filtered].sort((a, b) => {
       switch (sortOption) {
-        case "price_asc":  return (a.price ?? 0) - (b.price ?? 0);
+        case "price_asc": return (a.price ?? 0) - (b.price ?? 0);
         case "price_desc": return (b.price ?? 0) - (a.price ?? 0);
-        case "year_desc":  return (b.year ?? 0) - (a.year ?? 0);
-        case "year_asc":   return (a.year ?? 0) - (b.year ?? 0);
-        case "brand_asc":  return (a.brand ?? "").localeCompare(b.brand ?? "");
+        case "year_desc": return (b.year ?? 0) - (a.year ?? 0);
+        case "year_asc": return (a.year ?? 0) - (b.year ?? 0);
+        case "brand_asc": return (a.brand ?? "").localeCompare(b.brand ?? "");
         case "power_desc": return getPowerKM(b.power) - getPowerKM(a.power);
-        case "power_asc":  return getPowerKM(a.power) - getPowerKM(b.power);
+        case "power_asc": return getPowerKM(a.power) - getPowerKM(b.power);
         default: return 0;
       }
     });
