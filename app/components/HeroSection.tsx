@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { BoltIcon, ReceiptPercentIcon, KeyIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect, useRef } from "react";
-import { useCars, Filters } from "@/app/context/CarsContext";
+import { useCars, Filters, Car } from "@/app/context/CarsContext";
 
 type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3";
 
@@ -30,7 +30,7 @@ export default function HeroSection() {
     const handleClickOutside = (event: MouseEvent) => {
       const isOutsideMobile = mobileRef.current && !mobileRef.current.contains(event.target as Node);
       const isOutsideDesktop = desktopRef.current && !desktopRef.current.contains(event.target as Node);
-      
+
       // Jeśli jesteśmy w wersji mobile, sprawdzamy tylko mobileRef i vice versa
       if (isOutsideMobile && isOutsideDesktop) {
         setOpenDropdown(null);

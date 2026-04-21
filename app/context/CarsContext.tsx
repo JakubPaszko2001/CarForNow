@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, useMemo, ReactNode } fr
 
 const CACHE_TTL = 5 * 60 * 1000;
 
-type Car = any;
+export type Car = any;
 
 export type Filters = {
   brand: string;

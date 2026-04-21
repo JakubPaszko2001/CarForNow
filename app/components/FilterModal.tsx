@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { useCars, Filters } from "@/app/context/CarsContext";
+import { useCars, Filters, Car } from "@/app/context/CarsContext";
 import gsap from "gsap";
 
 type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3";
@@ -29,6 +29,20 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const filterContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterContainerRef.current && !filterContainerRef.current.contains(event.target as Node)) {
+        setOpenDropdown(null);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
 
   const getOptions = (field: DropdownField | "powerMin" | "powerMax" | "capacityMin" | "capacityMax"): string[] => {
     const options = cars.flatMap((car) => {
@@ -101,11 +115,22 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
 
   const handleClear = () => {
     setPendingFilters({
-      brand: "", model: "", fuel: "", transmission: "", drive: "",
-      yearMin: minYear, yearMax: maxYear,
-      priceMin: 0, priceMax: maxPrice,
-      powerMin: minPower, powerMax: maxPower,
-      capacityMin: minCapacity, capacityMax: maxCapacity,
+      brand: "",
+      model: "",
+      fuel: "",
+      transmission: "",
+      drive: "",
+      yearMin: minYear,
+      yearMax: maxYear,
+      priceMin: 0,
+      priceMax: maxPrice,
+      powerMin: minPower,
+      powerMax: maxPower,
+      capacityMin: minCapacity,
+      capacityMax: maxCapacity,
+      // segment: "",
+      powerKM: "",
+      capacityCM3: "",
     });
   };
 
@@ -161,7 +186,7 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
           </button>
         </div>
 
-        <div className="px-7 py-5 overflow-y-auto max-h-[60vh] flex flex-col gap-2">
+        <div ref={filterContainerRef} className="px-7 py-5 overflow-y-auto max-h-[60vh] flex flex-col gap-2">
           {(["brand", "model", "fuel", "transmission", "drive"] as DropdownField[]).map((field) => (
             <div key={field} className="relative">
               <button
@@ -212,11 +237,10 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
                         <button
                           key={opt}
                           onClick={() => handleSelect(field as any, opt)}
-                          className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0 ${
-                            (field === "powerMin" ? pendingFilters.powerMin : pendingFilters.powerMax) === parseInt(opt) 
-                            ? "text-[#e85d04]" 
+                          className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0 ${(field === "powerMin" ? pendingFilters.powerMin : pendingFilters.powerMax) === parseInt(opt)
+                            ? "text-[#e85d04]"
                             : "text-zinc-700"
-                          }`}
+                            }`}
                         >
                           {opt}
                         </button>
@@ -250,11 +274,10 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
                         <button
                           key={opt}
                           onClick={() => handleSelect(field as any, opt)}
-                          className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0 ${
-                            (field === "capacityMin" ? pendingFilters.capacityMin : pendingFilters.capacityMax) === parseInt(opt) 
-                            ? "text-[#e85d04]" 
+                          className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0 ${(field === "capacityMin" ? pendingFilters.capacityMin : pendingFilters.capacityMax) === parseInt(opt)
+                            ? "text-[#e85d04]"
                             : "text-zinc-700"
-                          }`}
+                            }`}
                         >
                           {opt}
                         </button>
