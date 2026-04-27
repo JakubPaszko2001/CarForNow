@@ -43,24 +43,24 @@ export default function HeroSection() {
   }, []);
 
   const getOptions = (field: DropdownField | "powerMin" | "powerMax" | "capacityMin" | "capacityMax"): string[] => {
-    const options = cars.flatMap((car) => {
-      const parts = String(car.power).split("/").map(p => p.trim());
+    const options: string[] = cars.flatMap((car): string[] => {
+      const parts: string[] = String(car.power).split("/").map((p: string) => p.trim());
       if (field === "powerKM" || field === "powerMin" || field === "powerMax") {
-        return parts.filter(p => p.toLowerCase().includes("km"));
+        return parts.filter((p: string) => p.toLowerCase().includes("km"));
       }
       if (field === "capacityCM3" || field === "capacityMin" || field === "capacityMax") {
-        return parts.filter(p => p.toLowerCase().includes("cm3"));
+        return parts.filter((p: string) => p.toLowerCase().includes("cm3"));
       }
       return [String(car[field as keyof Car])];
-    }).filter(Boolean);
+    }).filter((opt): opt is string => Boolean(opt));
 
-    const uniqueOptions = [...new Set(options)];
-    const filteredOptions = uniqueOptions.filter(opt => {
+    const uniqueOptions: string[] = [...new Set(options)];
+    const filteredOptions: string[] = uniqueOptions.filter((opt: string) => {
       if (!searchQuery) return true;
       return opt.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
-    return filteredOptions.sort((a, b) => {
+    return filteredOptions.sort((a: string, b: string) => {
       const numA = parseInt(a.replace(/\D/g, ""));
       const numB = parseInt(b.replace(/\D/g, ""));
       if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
@@ -70,7 +70,7 @@ export default function HeroSection() {
 
   const handleSelect = (field: DropdownField | "powerMin" | "powerMax" | "capacityMin" | "capacityMax", value: string) => {
     const newFilters = { ...pendingFilters };
-    const numValue = value === "" ? null : parseInt(value.replace(/\D/g, ""));
+    const numValue = value === "" ? null : parseInt(value);
 
     if (field === "powerMin") {
       newFilters.powerMin = numValue ?? minPower;
@@ -211,7 +211,7 @@ export default function HeroSection() {
                       <div className="absolute left-0 min-w-[140px] top-full mt-2 z-50 bg-[#1e1e1e] border border-white/15 rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.7)] max-h-64 overflow-y-auto">
                         <button onClick={() => handleSelect(field as any, "")} className="w-full text-left px-5 py-3.5 text-zinc-500 hover:bg-white/8 text-xs font-black uppercase transition-colors border-b border-white/5">Wszystkie</button>
                         {getOptions(field as any).map((option) => (
-                          <button key={option} onClick={() => handleSelect(field as any, option)} className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(field === "capacityMin" ? pendingFilters.capacityMin === parseInt(option) : pendingFilters.capacityMax === parseInt(option)) ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>{option}</button>
+                          <button key={option} onClick={() => handleSelect(field as any, option)} className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(field === "capacityMin" ? pendingFilters.capacityMin === parseInt(option) : pendingFilters.capacityMax === parseInt(option)) ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>{parseInt(option)}</button>
                         ))}
                       </div>
                     )}
@@ -370,7 +370,7 @@ export default function HeroSection() {
                             <div className="absolute left-0 min-w-[150px] top-full mt-2 z-50 bg-[#1e1e1e] border border-white/15 rounded-xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto">
                               <button onClick={() => handleSelect(field as any, "")} className="w-full text-left px-5 py-3 text-zinc-500 hover:bg-white/8 text-[10px] font-black uppercase transition-colors border-b border-white/5">Wszystkie</button>
                               {getOptions(field as any).map((option) => (
-                                <button key={option} onClick={() => handleSelect(field as any, option)} className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase whitespace-nowrap hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(field === "capacityMin" ? pendingFilters.capacityMin === parseInt(option) : pendingFilters.capacityMax === parseInt(option)) ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>{option}</button>
+                                <button key={option} onClick={() => handleSelect(field as any, option)} className={`w-full text-left px-5 py-3 text-[10px] font-black uppercase whitespace-nowrap hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(field === "capacityMin" ? pendingFilters.capacityMin === parseInt(option) : pendingFilters.capacityMax === parseInt(option)) ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>{parseInt(option)}</button>
                               ))}
                             </div>
                           )}

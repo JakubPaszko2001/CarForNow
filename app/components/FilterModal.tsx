@@ -72,7 +72,7 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
 
   const handleSelect = (field: DropdownField | "powerMin" | "powerMax" | "capacityMin" | "capacityMax", value: string) => {
     const newFilters = { ...pendingFilters };
-    const numValue = value === "" ? null : parseInt(value.replace(/\D/g, ""));
+    const numValue = value === "" ? null : parseInt(value);
 
     if (field === "powerMin") {
       newFilters.powerMin = numValue ?? minPower;
@@ -256,36 +256,26 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
           <div className="flex flex-col gap-1.5 px-1 mt-2">
             <span className="text-[10px] text-zinc-400 uppercase font-black tracking-widest px-1">Pojemność (cm3)</span>
             <div className="grid grid-cols-2 gap-2">
-              {["capacityMin", "capacityMax"].map((field) => (
-                <div key={field} className="relative">
-                  <button
-                    onClick={() => { setOpenDropdown(openDropdown === field ? null : field as any); setSearchQuery(""); }}
-                    className="w-full flex items-center justify-between px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl transition-all"
-                  >
-                    <span className={`text-sm font-black uppercase ${(field === "capacityMin" ? pendingFilters.capacityMin > minCapacity : pendingFilters.capacityMax < maxCapacity) ? "text-[#e85d04]" : "text-zinc-500"}`}>
-                      {field === "capacityMin" ? (pendingFilters.capacityMin > minCapacity ? `${pendingFilters.capacityMin} cm3` : "OD") : (pendingFilters.capacityMax < maxCapacity ? `${pendingFilters.capacityMax} cm3` : "DO")}
-                    </span>
-                    <ChevronDownIcon className="w-5 h-5 text-[#e85d04]/60" />
-                  </button>
-                  {openDropdown === field && (
-                    <div className="absolute left-0 mt-2 z-50 bg-white border border-zinc-200 rounded-2xl shadow-2xl min-w-[150px] max-h-64 overflow-y-auto">
-                      <button onClick={() => handleSelect(field as any, "")} className="w-full text-left px-5 py-3 text-xs text-zinc-400 font-black uppercase border-b border-zinc-50">Wszystkie</button>
-                      {getOptions(field as any).map((opt) => (
-                        <button
-                          key={opt}
-                          onClick={() => handleSelect(field as any, opt)}
-                          className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase whitespace-nowrap hover:bg-zinc-50 transition-colors border-b border-zinc-50 last:border-0 ${(field === "capacityMin" ? pendingFilters.capacityMin : pendingFilters.capacityMax) === parseInt(opt)
-                            ? "text-[#e85d04]"
-                            : "text-zinc-700"
-                            }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-zinc-400 uppercase font-black tracking-widest px-1">Od</span>
+                <input
+                  type="number"
+                  placeholder={String(minCapacity)}
+                  value={pendingFilters.capacityMin > minCapacity ? pendingFilters.capacityMin : ""}
+                  onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMin: e.target.value === "" ? minCapacity : Number(e.target.value) })}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-5 py-4 text-sm font-black text-zinc-900 focus:outline-none focus:border-[#e85d04]/50"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] text-zinc-400 uppercase font-black tracking-widest px-1">Do</span>
+                <input
+                  type="number"
+                  placeholder={String(maxCapacity)}
+                  value={pendingFilters.capacityMax < maxCapacity ? pendingFilters.capacityMax : ""}
+                  onChange={(e) => setPendingFilters({ ...pendingFilters, capacityMax: e.target.value === "" ? maxCapacity : Number(e.target.value) })}
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl px-5 py-4 text-sm font-black text-zinc-900 focus:outline-none focus:border-[#e85d04]/50"
+                />
+              </div>
             </div>
           </div>
 
