@@ -10,6 +10,7 @@ import {
   ChevronLeftIcon, ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import LeasingCalculator from '@/app/components/LeasingCalculator';
 
 const CACHE_TTL = 5 * 60 * 1000;
 
@@ -260,6 +261,9 @@ export default function CarPage() {
             )}
           </div>
         </div>
+
+        {/* KALKULATOR */}
+        <LeasingCalculator scrappedPrice={car.price || undefined} />
 
         {/* WYPOSAŻENIE */}
         {car.wyposazenie?.length > 0 && (
