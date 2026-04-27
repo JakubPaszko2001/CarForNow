@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Bars3Icon } from "@heroicons/react/24/outline";
 import FleetGallery from "@/app/components/FleetGallery";
 
 export default function Navbar() {
@@ -31,22 +30,22 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Menu - Desktop */}
-          <nav className="hidden xl:flex items-center gap-8">
+          {/* Menu - wszystkie rozmiary */}
+          <nav className="flex items-center gap-3 sm:gap-5 md:gap-7 xl:gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
                 target={link.href.startsWith("http") ? "_blank" : undefined}
                 rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="text-zinc-300 hover:text-[#e85d04] text-[10px] font-black uppercase tracking-widest transition-colors"
+                className="hidden sm:block text-zinc-300 hover:text-[#e85d04] text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap"
               >
                 {link.name}
               </Link>
             ))}
             <button
               onClick={() => setFleetOpen(true)}
-              className="text-zinc-300 hover:text-[#e85d04] text-[10px] font-black uppercase tracking-widest transition-colors"
+              className="text-zinc-300 hover:text-[#e85d04] text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap"
             >
               Nasza Flota
             </button>
@@ -54,24 +53,11 @@ export default function Navbar() {
               href="https://m.me/61580848462292"
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-4 bg-[#e85d04] text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#ff6d0a] transition-all active:scale-95 shadow-[0_10px_20px_rgba(232,93,4,0.2)]"
+              className="bg-[#e85d04] text-white px-3 sm:px-5 md:px-6 py-2 md:py-2.5 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-[#ff6d0a] transition-all active:scale-95 shadow-[0_10px_20px_rgba(232,93,4,0.2)] whitespace-nowrap"
             >
               Kontakt
             </Link>
           </nav>
-
-          {/* Mobile */}
-          <div className="flex items-center gap-4 xl:hidden">
-            <button
-              onClick={() => setFleetOpen(true)}
-              className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-[#e85d04] border border-[#e85d04]/30 px-4 py-2 rounded-lg"
-            >
-              Nasza Flota
-            </button>
-            <button className="text-[#e85d04] p-2 hover:bg-white/5 rounded-xl transition-all">
-              <Bars3Icon className="w-7 h-7 stroke-2" />
-            </button>
-          </div>
 
         </div>
         <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#e85d04]/50 to-transparent opacity-30" />
