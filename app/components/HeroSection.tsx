@@ -118,16 +118,49 @@ export default function HeroSection() {
     <section className="relative w-full bg-black overflow-hidden">
       {/* BACKGROUND IMAGES (3 BREAKPOINTY) */}
       <div className="absolute inset-0 z-0">
+
+        {/* 1. MOBILE (poniżej 768px) */}
         <div className="md:hidden absolute inset-0">
-          <Image src="/BG2.jpg" alt="Background Mobile" fill priority unoptimized className="object-none" style={{ objectPosition: '30% center' }} />
+          <Image
+            src="/BG2.jpg"
+            alt="Background Mobile"
+            fill
+            priority
+            unoptimized
+            className="object-none"
+            style={{ objectPosition: '30% center' }} // Ustaw kadr dla telefonu
+          />
         </div>
-        <div className="hidden md:block lg:hidden absolute inset-0">
-          <Image src="/BG2.jpg" alt="Background Tablet" fill priority unoptimized className="object-none" style={{ objectPosition: '35% center' }} />
+
+        {/* 2. TABLET (768px - 1023px) */}
+        <div className="hidden md:block xl:hidden absolute inset-0">
+          <Image
+            src="/BG2.jpg"
+            alt="Background Tablet"
+            fill
+            priority
+            unoptimized
+            className="object-none"
+            style={{ objectPosition: '20% center' }} // Ustaw kadr dla tabletu
+          />
         </div>
-        <div className="hidden lg:block absolute inset-0">
-          <Image src="/BG2.jpg" alt="Background Desktop" fill priority unoptimized className="object-cover" />
+
+        {/* 3. DESKTOP (od 1024px wzwyż) */}
+        <div className="hidden xl:block absolute inset-0">
+          <Image
+            src="/BG2.jpg"
+            alt="Background Desktop"
+            fill
+            priority
+            unoptimized
+            className="object-none"
+            style={{ objectPosition: 'clamp(5%, 10vw, 25%) center' }} // Twoje oryginalne ustawienie
+          />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/90" />
+
+        {/* Gradienty */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black opacity-40" />
       </div>
 
       {/* ===== MOBILE (poniżej 1024px) ===== */}
