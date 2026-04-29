@@ -3,12 +3,13 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  Cog6ToothIcon, 
-  BoltIcon, 
-  ScaleIcon, 
-  CalendarIcon, 
-  ArrowRightIcon 
+import {
+  Cog6ToothIcon,
+  BoltIcon,
+  ScaleIcon,
+  CalendarIcon,
+  ArrowRightIcon,
+  MapPinIcon,
 } from "@heroicons/react/24/outline";
 
 interface CarCardProps {
@@ -26,6 +27,8 @@ interface CarCardProps {
     tag?: "Nowość" | "Polecany";
     brandLogo: string;
     link: string;
+    lokalizacja?: string;
+    nadwozie?: string;
   };
 }
 
@@ -98,11 +101,28 @@ export default function CarCard({ car }: CarCardProps) {
         <div className="flex-1 p-6 md:p-8 flex flex-col justify-between">
 
           <div className="flex justify-between items-center gap-4">
-            <Link href={car.link} className="hover:text-[#e85d04] transition-colors">
-              <h3 className="text-3xl font-black text-[#1a1a1a] uppercase leading-none tracking-tight">
-                {car.brand} <span className="text-zinc-400">{car.model}</span>
-              </h3>
-            </Link>
+            <div>
+              <Link href={car.link} className="hover:text-[#e85d04] transition-colors">
+                <h3 className="text-3xl font-black text-[#1a1a1a] uppercase leading-none tracking-tight">
+                  {car.brand} <span className="text-zinc-400">{car.model}</span>
+                </h3>
+              </Link>
+              {(car.lokalizacja || car.nadwozie) && (
+                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                  {car.nadwozie && (
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500 bg-zinc-100 px-2.5 py-1 rounded-lg">
+                      {car.nadwozie}
+                    </span>
+                  )}
+                  {car.lokalizacja && (
+                    <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-zinc-500 bg-zinc-100 px-2.5 py-1 rounded-lg">
+                      <MapPinIcon className="w-3 h-3 text-[#e85d04]" />
+                      {car.lokalizacja}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="relative w-10 h-10 min-w-[40px] min-h-[40px] flex-shrink-0">
               <Image src={car.brandLogo} alt={car.brand} fill className="object-contain object-center" />
             </div>

@@ -1,0 +1,32 @@
+{
+  "citroen-c3-18357": {
+    "lokalizacja": "Białystok",
+    "nadwozie": "Hatchback",
+    "wartoscPojazdu": 100000
+  },
+  "opel-combo-10411": {
+    "lokalizacja": "Augustów",
+    "nadwozie": "SUV",
+    "wartoscPojazdu": null
+  },
+  "volvo-v40-18370": {
+    "lokalizacja": "Warszawa",
+    "nadwozie": "Hatchback",
+    "wartoscPojazdu": null
+  },
+  "ford-transit-courier-18154": {
+    "lokalizacja": "Białystok ",
+    "nadwozie": "SUV",
+    "wartoscPojazdu": null
+  },
+  "skoda-fabia-10714": {
+    "lokalizacja": "Białystok",
+    "nadwozie": "Sedan",
+    "wartoscPojazdu": null
+  },
+  "skoda-octavia-18090": {
+    "lokalizacja": "",
+    "nadwozie": "kombi",
+    "wartoscPojazdu": null
+  }
+}

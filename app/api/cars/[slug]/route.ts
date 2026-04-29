@@ -1,4 +1,17 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
+
+function readCustomProps(slug: string): Record<string, unknown> {
+  try {
+    const file = path.join(process.cwd(), 'data', 'carProperties.json');
+    if (!fs.existsSync(file)) return {};
+    const all = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    return all[slug] ?? {};
+  } catch {
+    return {};
+  }
+}
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
@@ -106,7 +119,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
       skrzynia: params_data['Skrzynia biegów'] || 'N/A',
       kolor: params_data['Kolor'] || 'N/A',
       brandLogo: `/${brand.toLowerCase()}Logo.png`,
-      wyposazenie: [], // Możesz tu dodać logikę jeśli znajdziesz listę <ul>
+      wyposazenie: [],
+      ...readCustomProps(slug),
     });
 
   } catch (error) {

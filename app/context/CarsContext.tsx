@@ -22,6 +22,8 @@ export type Filters = {
   capacityMax: number;
   powerKM: string;
   capacityCM3: string;
+  lokalizacja: string;
+  nadwozie: string;
 };
 
 export type SortOption =
@@ -34,7 +36,6 @@ export type SortOption =
   | "power_asc"
   | null;
 
-// 1. Dodano clearFilters do typu
 type CarsContextType = {
   cars: Car[];
   loading: boolean;
@@ -43,6 +44,7 @@ type CarsContextType = {
   setPendingFilters: (filters: Filters) => void;
   applyFilters: () => void;
   clearFilters: () => void;
+  applySegmentFilter: (nadwozie: string) => void;
   filteredCars: Car[];
   maxPrice: number;
   minYear: number;
@@ -71,6 +73,8 @@ const defaultFilters: Filters = {
   capacityMax: 5000,
   powerKM: "",
   capacityCM3: "",
+  lokalizacja: "",
+  nadwozie: "",
 };
 
 const CarsContext = createContext<CarsContextType>({
@@ -81,6 +85,7 @@ const CarsContext = createContext<CarsContextType>({
   setPendingFilters: () => { },
   applyFilters: () => { },
   clearFilters: () => { },
+  applySegmentFilter: () => { },
   filteredCars: [],
   maxPrice: 99999,
   minYear: 1900,
@@ -183,11 +188,17 @@ export function CarsProvider({ children }: { children: ReactNode }) {
 
   const applyFilters = () => setFilters({ ...pendingFilters });
 
-  // 2. Implementacja funkcji czyszczenia
   const clearFilters = () => {
     const reset = { ...defaultFilters, priceMax: maxPrice, yearMin: minYear, yearMax: maxYear, powerMin: minPower, powerMax: maxPower, capacityMin: minCapacity, capacityMax: maxCapacity };
     setPendingFilters(reset);
     setFilters(reset);
+  };
+
+  const applySegmentFilter = (nadwozie: string) => {
+    const newNadwozie = filters.nadwozie.toLowerCase() === nadwozie.toLowerCase() ? "" : nadwozie;
+    const newFilters = { ...filters, nadwozie: newNadwozie };
+    setFilters(newFilters);
+    setPendingFilters(newFilters);
   };
 
   const filteredCars = useMemo(() => {
@@ -206,6 +217,8 @@ export function CarsProvider({ children }: { children: ReactNode }) {
 
       if (filters.powerKM && !String(car.power).includes(filters.powerKM)) return false;
       if (filters.capacityCM3 && !String(car.power).includes(filters.capacityCM3)) return false;
+      if (filters.lokalizacja && String(car.lokalizacja ?? "").toLowerCase() !== filters.lokalizacja.toLowerCase()) return false;
+      if (filters.nadwozie && String(car.nadwozie ?? "").toLowerCase() !== filters.nadwozie.toLowerCase()) return false;
 
       return true;
     });
@@ -236,6 +249,7 @@ export function CarsProvider({ children }: { children: ReactNode }) {
         setPendingFilters,
         applyFilters,
         clearFilters,
+        applySegmentFilter,
         filteredCars,
         maxPrice,
         minYear,

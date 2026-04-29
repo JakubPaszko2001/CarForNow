@@ -19,11 +19,12 @@ function calcMonthly(carValue: number, downPayment: number, months: Period): num
 
 interface Props {
   scrappedPrice?: number;
+  initialCarValue?: number;
 }
 
-export default function LeasingCalculator({ scrappedPrice }: Props) {
+export default function LeasingCalculator({ scrappedPrice, initialCarValue }: Props) {
   const [mode, setMode] = useState<"offer" | "calc">(scrappedPrice ? "offer" : "calc");
-  const [carValue, setCarValue] = useState("");
+  const [carValue, setCarValue] = useState(initialCarValue ? String(initialCarValue) : "");
   const [downValue, setDownValue] = useState("");
   const [downMode, setDownMode] = useState<"pln" | "pct">("pln");
   const [activePeriod, setActivePeriod] = useState<Period>(60);
@@ -91,19 +92,21 @@ export default function LeasingCalculator({ scrappedPrice }: Props) {
         ) : (
           /* ── KALKULATOR MODE ── */
           <div className="flex flex-col gap-5">
-            {/* Wartość pojazdu */}
-            <div>
-              <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-2">
-                Wartość pojazdu (zł)
-              </label>
-              <input
-                type="number"
-                value={carValue}
-                onChange={(e) => setCarValue(e.target.value)}
-                placeholder="np. 100000"
-                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-black text-zinc-900 focus:outline-none focus:border-[#e85d04]/50 placeholder-zinc-300"
-              />
-            </div>
+            {/* Wartość pojazdu — ukryta gdy ustawiona przez admina */}
+            {!initialCarValue && (
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 block mb-2">
+                  Wartość pojazdu (zł)
+                </label>
+                <input
+                  type="number"
+                  value={carValue}
+                  onChange={(e) => setCarValue(e.target.value)}
+                  placeholder="np. 100000"
+                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm font-black text-zinc-900 focus:outline-none focus:border-[#e85d04]/50 placeholder-zinc-300"
+                />
+              </div>
+            )}
 
             {/* Opłata wstępna */}
             <div>

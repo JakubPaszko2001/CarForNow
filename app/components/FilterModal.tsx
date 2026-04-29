@@ -5,7 +5,7 @@ import { XMarkIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useCars, Filters, Car } from "@/app/context/CarsContext";
 import gsap from "gsap";
 
-type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3";
+type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3" | "lokalizacja";
 
 const FIELD_LABELS: Record<DropdownField, string> = {
   brand: "Marka",
@@ -15,6 +15,7 @@ const FIELD_LABELS: Record<DropdownField, string> = {
   fuel: "Paliwo",
   transmission: "Skrzynia biegów",
   drive: "Napęd",
+  lokalizacja: "Lokalizacja",
 };
 
 interface FilterModalProps {
@@ -53,7 +54,9 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
       if (field === "capacityCM3" || field === "capacityMin" || field === "capacityMax") {
         return parts.filter(p => p.toLowerCase().includes("cm3"));
       }
-      return [String(car[field as keyof Car])];
+      const val = car[field as keyof Car];
+      const trimmed = val != null ? String(val).trim() : "";
+      return trimmed !== "" ? [trimmed] : [];
     }).filter(Boolean);
 
     const uniqueOptions = [...new Set(options)];
@@ -128,9 +131,10 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
       powerMax: maxPower,
       capacityMin: minCapacity,
       capacityMax: maxCapacity,
-      // segment: "",
       powerKM: "",
       capacityCM3: "",
+      lokalizacja: "",
+      nadwozie: "",
     });
   };
 
@@ -187,7 +191,7 @@ export default function FilterModal({ isOpen, onClose }: FilterModalProps) {
         </div>
 
         <div ref={filterContainerRef} className="px-7 py-5 overflow-y-auto max-h-[60vh] flex flex-col gap-2">
-          {(["brand", "model", "fuel", "transmission", "drive"] as DropdownField[]).map((field) => (
+          {(["brand", "model", "fuel", "transmission", "drive", "lokalizacja"] as DropdownField[]).map((field) => (
             <div key={field} className="relative">
               <button
                 onClick={() => { setOpenDropdown(openDropdown === field ? null : field); setSearchQuery(""); }}

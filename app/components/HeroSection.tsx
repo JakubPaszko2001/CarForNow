@@ -6,7 +6,7 @@ import { BoltIcon, ReceiptPercentIcon, KeyIcon } from "@heroicons/react/24/outli
 import { useState, useEffect, useRef } from "react";
 import { useCars, Filters, Car } from "@/app/context/CarsContext";
 
-type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3";
+type DropdownField = "brand" | "model" | "fuel" | "transmission" | "drive" | "powerKM" | "capacityCM3" | "lokalizacja";
 
 const FIELD_LABELS: Record<DropdownField, string> = {
   brand: "Marka",
@@ -16,6 +16,7 @@ const FIELD_LABELS: Record<DropdownField, string> = {
   fuel: "Paliwo",
   transmission: "Skrzynia biegów",
   drive: "Napęd",
+  lokalizacja: "Lokalizacja",
 };
 
 export default function HeroSection() {
@@ -51,7 +52,9 @@ export default function HeroSection() {
       if (field === "capacityCM3" || field === "capacityMin" || field === "capacityMax") {
         return parts.filter((p: string) => p.toLowerCase().includes("cm3"));
       }
-      return [String(car[field as keyof Car])];
+      const val = (car as any)[field];
+      const trimmed = val != null ? String(val).trim() : "";
+      return trimmed !== "" ? [trimmed] : [];
     }).filter((opt): opt is string => Boolean(opt));
 
     const uniqueOptions: string[] = [...new Set(options)];
@@ -138,15 +141,15 @@ export default function HeroSection() {
 
         <div ref={mobileRef} className="w-full bg-[#121212]/80 backdrop-blur-xl border border-white/10 rounded-[40px] p-7 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]">
           <div className="flex flex-col gap-2">
-            {(["brand", "model", "fuel", "transmission", "drive"] as DropdownField[]).map((field) => (
+            {(["brand", "model", "fuel", "transmission", "drive", "lokalizacja"] as DropdownField[]).map((field) => (
               <div key={field} className="relative">
                 <button
                   onClick={() => { setOpenDropdown(openDropdown === field ? null : field); setSearchQuery(""); }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60" : pendingFilters[field as keyof Filters] ? "bg-white/8 border-[#e85d04]/30" : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"}`}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60" : (pendingFilters as any)[field] ? "bg-white/8 border-[#e85d04]/30" : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"}`}
                 >
                   <div className="flex flex-col items-start gap-0.5">
                     <span className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">{FIELD_LABELS[field]}</span>
-                    <span className={`text-sm font-black uppercase tracking-wide ${pendingFilters[field as keyof Filters] ? "text-[#e85d04]" : "text-zinc-300"}`}>{pendingFilters[field as keyof Filters] || "Wszystkie"}</span>
+                    <span className={`text-sm font-black uppercase tracking-wide ${(pendingFilters as any)[field] ? "text-[#e85d04]" : "text-zinc-300"}`}>{(pendingFilters as any)[field] || "Wszystkie"}</span>
                   </div>
                   <ChevronDownIcon className={`w-5 h-5 text-[#e85d04] transition-transform duration-200 ${openDropdown === field ? "rotate-180" : ""}`} />
                 </button>
@@ -159,7 +162,7 @@ export default function HeroSection() {
                     )}
                     <button onClick={() => { handleSelect(field, ""); setSearchQuery(""); }} className="w-full text-left px-5 py-3.5 text-zinc-500 hover:bg-white/8 text-xs font-black uppercase tracking-widest transition-colors border-b border-white/5">Wszystkie</button>
                     {getOptions(field).map((option) => (
-                      <button key={option} onClick={() => handleSelect(field, option)} className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase tracking-widest hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${pendingFilters[field as keyof Filters] === option ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>{option}</button>
+                      <button key={option} onClick={() => handleSelect(field, option)} className={`w-full text-left px-5 py-3.5 text-xs font-black uppercase tracking-widest hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(pendingFilters as any)[field] === option ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>{option}</button>
                     ))}
                   </div>
                 )}
@@ -296,15 +299,15 @@ export default function HeroSection() {
           <div className="w-full max-w-md xl:max-w-none xl:w-[420px] flex-shrink-0 flex flex-col gap-6 text-center xl:text-left items-center xl:items-start">
             <div ref={desktopRef} className="w-full bg-[#121212]/80 backdrop-blur-xl border border-white/10 rounded-[32px] p-5 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)]">
               <div className="flex flex-col gap-2 text-left">
-                {(["brand", "model", "fuel", "transmission", "drive"] as DropdownField[]).map((field) => (
+                {(["brand", "model", "fuel", "transmission", "drive", "lokalizacja"] as DropdownField[]).map((field) => (
                   <div key={field} className="relative">
                     <button
                       onClick={() => { setOpenDropdown(openDropdown === field ? null : field); setSearchQuery(""); }}
-                      className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60" : pendingFilters[field as keyof Filters] ? "bg-white/8 border-[#e85d04]/30" : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"}`}
+                      className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border transition-all ${openDropdown === field ? "bg-white/10 border-[#e85d04]/60" : (pendingFilters as any)[field] ? "bg-white/8 border-[#e85d04]/30" : "bg-white/5 border-white/10 hover:bg-white/8 hover:border-white/20"}`}
                     >
                       <div className="flex flex-col items-start gap-0.5">
                         <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest">{FIELD_LABELS[field]}</span>
-                        <span className={`text-xs font-black uppercase tracking-wide ${pendingFilters[field as keyof Filters] ? "text-[#e85d04]" : "text-zinc-300"}`}>{pendingFilters[field as keyof Filters] || "Wszystkie"}</span>
+                        <span className={`text-xs font-black uppercase tracking-wide ${(pendingFilters as any)[field] ? "text-[#e85d04]" : "text-zinc-300"}`}>{(pendingFilters as any)[field] || "Wszystkie"}</span>
                       </div>
                       <ChevronDownIcon className={`w-4 h-4 text-[#e85d04] transition-transform duration-200 ${openDropdown === field ? "rotate-180" : ""}`} />
                     </button>
@@ -317,7 +320,7 @@ export default function HeroSection() {
                         )}
                         <button onClick={() => { handleSelect(field, ""); setSearchQuery(""); }} className="w-full text-left px-4 py-2.5 text-zinc-500 hover:bg-white/8 text-[11px] font-black uppercase tracking-widest transition-colors border-b border-white/5">Wszystkie</button>
                         {getOptions(field).map((option) => (
-                          <button key={option} onClick={() => handleSelect(field, option)} className={`w-full text-left px-4 py-2.5 text-[11px] font-black uppercase tracking-widest hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${pendingFilters[field as keyof Filters] === option ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>{option}</button>
+                          <button key={option} onClick={() => handleSelect(field, option)} className={`w-full text-left px-4 py-2.5 text-[11px] font-black uppercase tracking-widest hover:bg-white/8 transition-colors border-b border-white/5 last:border-0 ${(pendingFilters as any)[field] === option ? "text-[#e85d04] bg-[#e85d04]/5" : "text-zinc-200"}`}>{option}</button>
                         ))}
                       </div>
                     )}
