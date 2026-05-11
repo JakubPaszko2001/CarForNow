@@ -2,16 +2,40 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-function readCustomProps(slug: string): Record<string, unknown> {
+const PROPS_FILE = path.join(process.cwd(), 'data', 'carProperties.json');
+
+function readAllProps(): Record<string, Record<string, unknown>> {
   try {
-    const file = path.join(process.cwd(), 'data', 'carProperties.json');
-    if (!fs.existsSync(file)) return {};
-    const all = JSON.parse(fs.readFileSync(file, 'utf-8'));
-    return all[slug] ?? {};
+    if (!fs.existsSync(PROPS_FILE)) return {};
+    return JSON.parse(fs.readFileSync(PROPS_FILE, 'utf-8'));
   } catch {
     return {};
   }
 }
+
+function writeAllProps(data: Record<string, Record<string, unknown>>) {
+  const dir = path.dirname(PROPS_FILE);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(PROPS_FILE, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+// Reverse calcMonthly — wylicza wartość pojazdu z raty, opłaty wstępnej i okresu.
+// Wzór: 2X² - (3D + total60)X + D² = 0 (większy pierwiastek).
+function calcCarValue(monthly: number, downPayment: number, months: number): number {
+  if (!monthly || monthly <= 0 || months <= 0) return 0;
+  const targetMonthly = monthly + 5; // środek 10-zł "kosza" floor w calcMonthly
+  const total = targetMonthly * months;
+  const yearsLess = (60 - months) / 12;
+  const total60 = total / Math.pow(0.9, yearsLess);
+  const D = downPayment;
+  const b = -(3 * D + total60);
+  const c = D * D;
+  const disc = b * b - 8 * c;
+  if (disc < 0) return 0;
+  const X = (-b + Math.sqrt(disc)) / 4;
+  return Math.max(X, 0);
+}
+
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
@@ -104,12 +128,49 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
     // W tym HTML opis jest w <header><p>
     const opis = $('#onecar-car-content header p').first().text().trim();
 
+    // --- 7. OPŁATA WSTĘPNA (pierwsza/domyślna opcja w selekcie) ---
+    let oplataWstepna = 0;
+    const oplataText = $('#oplata-poczatkowa option').first().text().trim();
+    if (oplataText) {
+      oplataWstepna = parseInt(oplataText.replace(/\D/g, ''), 10) || 0;
+    }
+
+    // --- 8. OKRES UMOWY (pierwsza/domyślna opcja w selekcie, w miesiącach) ---
+    let okresUmowy = 0;
+    const okresText = $('#okres-umowy option').first().text().trim();
+    if (okresText) {
+      const m = okresText.match(/\d+/);
+      if (m) okresUmowy = parseInt(m[0], 10) || 0;
+    }
+
+    // --- 9. WARTOŚĆ POJAZDU (zawsze świeżo liczona z API, auto-zapis do carProperties.json) ---
+    const allProps = readAllProps();
+    const customProps = { ...(allProps[slug] ?? {}) };
+    let wartoscPojazdu: number | null = null;
+
+    if (price > 0 && okresUmowy > 0) {
+      const raw = calcCarValue(price, oplataWstepna, okresUmowy);
+      if (raw > 0) wartoscPojazdu = Math.round(raw);
+    }
+
+    if (wartoscPojazdu != null && customProps.wartoscPojazdu !== wartoscPojazdu) {
+      customProps.wartoscPojazdu = wartoscPojazdu;
+      allProps[slug] = customProps;
+      try {
+        writeAllProps(allProps);
+      } catch (e) {
+        console.error('⚠️ Nie udało się zapisać wartości pojazdu:', e);
+      }
+    }
+
     return NextResponse.json({
       brand,
       model,
       images: images.length > 0 ? images : ['/placeholder-car.png'],
       opis,
       price,
+      oplataWstepna,
+      okresUmowy,
       lokalizacja: lokalizacja || 'Białystok',
       rok: params_data['Rok produkcji'] || 'N/A',
       nadwozie: params_data['Nadwozie'] || 'N/A',
@@ -120,7 +181,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
       kolor: params_data['Kolor'] || 'N/A',
       brandLogo: `/${brand.toLowerCase()}Logo.png`,
       wyposazenie: [],
-      ...readCustomProps(slug),
+      ...customProps,
+      ...(wartoscPojazdu != null ? { wartoscPojazdu } : {}),
     });
 
   } catch (error) {

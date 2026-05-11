@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { MapPinIcon, CheckCircleIcon, CogIcon, LockClosedIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
+import { MapPinIcon, CheckCircleIcon, CogIcon, LockClosedIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 const PASSWORD = "admincarsfornow";
 const SESSION_KEY = "admin_auth";
@@ -196,28 +197,48 @@ export default function AdminPage() {
                   className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-sm"
                 >
                   <div className="flex flex-col md:flex-row">
-                    {/* Car image */}
-                    <div className="relative w-full md:w-48 h-36 flex-shrink-0 bg-zinc-100">
-                      <Image
-                        src={car.image}
-                        alt={`${car.brand} ${car.model}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+                    {/* Car image — klik przenosi do karty auta */}
+                    <Link
+                      href={`/auto/${slug}`}
+                      className="relative w-full md:w-72 h-56 md:h-auto md:self-stretch flex-shrink-0 bg-zinc-100 group block overflow-hidden"
+                      title="Otwórz kartę auta"
+                    >
+                      {car.image && !car.image.includes("placeholder") ? (
+                        <Image
+                          src={car.image}
+                          alt={`${car.brand} ${car.model}`}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 288px"
+                          unoptimized
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                          Brak zdjęcia
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <ArrowTopRightOnSquareIcon className="w-6 h-6 text-white" />
+                      </div>
+                    </Link>
 
                     {/* Content */}
                     <div className="flex-1 p-5 flex flex-col gap-4">
                       {/* Title row */}
                       <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h2 className="text-lg font-black text-[#1a1a1a] uppercase tracking-tight">
+                        <Link
+                          href={`/auto/${slug}`}
+                          className="group"
+                          title="Otwórz kartę auta"
+                        >
+                          <h2 className="text-lg font-black text-[#1a1a1a] uppercase tracking-tight group-hover:text-[#e85d04] transition-colors flex items-center gap-2">
                             {car.brand} <span className="text-zinc-400">{car.model}</span>
+                            <ArrowTopRightOnSquareIcon className="w-4 h-4 text-zinc-300 group-hover:text-[#e85d04] transition-colors" />
                           </h2>
                           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">
                             {slug}
                           </p>
-                        </div>
+                        </Link>
                         {car.price > 0 && (
                           <span className="text-sm font-black text-[#e85d04] bg-[#e85d04]/10 px-3 py-1.5 rounded-xl whitespace-nowrap">
                             {car.price.toLocaleString("pl-PL")} zł/mc

@@ -2,31 +2,67 @@
   "citroen-c3-18357": {
     "lokalizacja": "Białystok",
     "nadwozie": "Hatchback",
-    "wartoscPojazdu": 100000
+    "wartoscPojazdu": 32138
   },
   "opel-combo-10411": {
     "lokalizacja": "Augustów",
     "nadwozie": "SUV",
-    "wartoscPojazdu": null
+    "wartoscPojazdu": 36510
   },
   "volvo-v40-18370": {
     "lokalizacja": "Warszawa",
     "nadwozie": "Hatchback",
-    "wartoscPojazdu": null
+    "wartoscPojazdu": 45976
   },
   "ford-transit-courier-18154": {
     "lokalizacja": "Białystok ",
     "nadwozie": "SUV",
-    "wartoscPojazdu": null
+    "wartoscPojazdu": 48536
   },
   "skoda-fabia-10714": {
     "lokalizacja": "Białystok",
     "nadwozie": "Sedan",
-    "wartoscPojazdu": null
+    "wartoscPojazdu": 51403
   },
   "skoda-octavia-18090": {
     "lokalizacja": "",
     "nadwozie": "kombi",
     "wartoscPojazdu": null
+  },
+  "citroen-c4-13133": {
+    "wartoscPojazdu": 52564
+  },
+  "ford-transit-courier-16750": {
+    "wartoscPojazdu": 55279
+  },
+  "skoda-rapid-18384": {
+    "wartoscPojazdu": 57846
+  },
+  "citroen-c4-13135": {
+    "wartoscPojazdu": 61577
+  },
+  "skoda-octavia-11121": {
+    "wartoscPojazdu": 63804
+  },
+  "volkswagen-tiguan-18191": {
+    "wartoscPojazdu": 67292
+  },
+  "skoda-octavia-16500": {
+    "wartoscPojazdu": 69555
+  },
+  "skoda-octavia-18184": {
+    "wartoscPojazdu": 77321
+  },
+  "skoda-octavia-16883": {
+    "wartoscPojazdu": 80324
+  },
+  "audi-a6-limousine-8313": {
+    "wartoscPojazdu": 82498
+  },
+  "opel-insignia-18229": {
+    "wartoscPojazdu": 83472
+  },
+  "ford-transit-15924": {
+    "wartoscPojazdu": 91601
   }
 }

@@ -263,7 +263,12 @@ export default function CarPage() {
         </div>
 
         {/* KALKULATOR */}
-        <LeasingCalculator scrappedPrice={car.price || undefined} initialCarValue={car.wartoscPojazdu || undefined} />
+        <LeasingCalculator
+          scrappedPrice={car.price || undefined}
+          initialCarValue={car.wartoscPojazdu || undefined}
+          oplataWstepna={car.oplataWstepna || undefined}
+          okresUmowy={car.okresUmowy || undefined}
+        />
 
         {/* WYPOSAŻENIE */}
         {car.wyposazenie?.length > 0 && (

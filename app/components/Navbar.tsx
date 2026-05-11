@@ -15,7 +15,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="w-full relative overflow-hidden bg-black/10 backdrop-blur-2xl border-b border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+      <header className="w-full relative overflow-hidden bg-black border-b border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
         <div className="flex h-20 items-center justify-between px-6 md:px-12 max-w-7xl mx-auto w-full relative z-10">
 
           <Link href="/" className="flex items-center transition-transform active:scale-95">
