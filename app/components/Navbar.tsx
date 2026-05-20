@@ -11,6 +11,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Strona Główna", href: "/" },
     { name: "O nas", href: "/o-nas" },
+    { name: "Kalkulator", href: "/kalkulator" },
   ];
 
   return (
