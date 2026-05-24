@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   CheckCircleIcon,
@@ -10,6 +11,20 @@ import {
   MapPinIcon,
   BuildingOfficeIcon,
 } from "@heroicons/react/24/outline";
+import CreatedBy from "@/app/components/CreatedBy";
+
+export const metadata: Metadata = {
+  title: "O nas — kim jesteśmy i jak działa wynajem z wykupem",
+  description:
+    "CarForNow to wynajem długoterminowy aut z opcją wykupu w Białymstoku. Poznaj proces w 4 krokach, wymagania (dowód + prawo jazdy) i zalety naszej oferty.",
+  alternates: { canonical: "/o-nas" },
+  openGraph: {
+    title: "O CarForNow — wynajem długoterminowy z opcją wykupu",
+    description:
+      "Bez BIK, bez zaświadczeń. Po ostatniej racie auto jest Twoje. Sprawdź, jak działa nasz wynajem.",
+    url: "https://carfornow.pl/o-nas",
+  },
+};
 
 const STEPS = [
   {
@@ -262,6 +277,7 @@ export default function AboutPage() {
         </div>
       </div>
 
+      <CreatedBy />
     </div>
   );
 }

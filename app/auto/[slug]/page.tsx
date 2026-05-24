@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import LeasingCalculator from '@/app/components/LeasingCalculator';
+import CreatedBy from '@/app/components/CreatedBy';
 
 const CACHE_TTL = 5 * 60 * 1000;
 
@@ -293,6 +294,8 @@ export default function CarPage() {
           </div>
         )}
       </div>
+
+      <CreatedBy />
     </div>
   );
 }

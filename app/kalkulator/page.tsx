@@ -1,9 +1,24 @@
+import type { Metadata } from "next";
 import LeasingCalculatorFull from "@/app/components/LeasingCalculatorFull";
 import {
   DocumentCheckIcon,
   IdentificationIcon,
   CalculatorIcon,
 } from "@heroicons/react/24/outline";
+import CreatedBy from "@/app/components/CreatedBy";
+
+export const metadata: Metadata = {
+  title: "Kalkulator leasingowy — oblicz ratę wynajmu",
+  description:
+    "Policz ratę wynajmu długoterminowego z opcją wykupu w CarForNow. Zmieniaj okres, opłatę wstępną i wartość auta — sprawdź, ile zapłacisz miesięcznie.",
+  alternates: { canonical: "/kalkulator" },
+  openGraph: {
+    title: "Kalkulator leasingowy CarForNow",
+    description:
+      "Dopasuj ofertę do swoich możliwości — policz miesięczną ratę online.",
+    url: "https://carfornow.pl/kalkulator",
+  },
+};
 
 export default function CalculatorPage() {
   return (
@@ -113,6 +128,8 @@ export default function CalculatorPage() {
           </div>
         </div>
       </div>
+
+      <CreatedBy />
     </div>
   );
 }
