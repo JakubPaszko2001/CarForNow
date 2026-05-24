@@ -230,8 +230,8 @@ export default function AboutPage() {
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Firma</p>
-                <p className="text-sm font-bold text-zinc-900">Grupa Stu sp. z o.o.</p>
-                <p className="text-xs text-zinc-500 font-medium mt-0.5">NIP: 9662090283</p>
+                <p className="text-sm font-bold text-zinc-900">CFY SPÓŁKA AKCYJNA</p>
+                <p className="text-xs text-zinc-500 font-medium mt-0.5">NIP: 9662156965</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -240,8 +240,8 @@ export default function AboutPage() {
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Adres</p>
-                <p className="text-sm font-bold text-zinc-900">ul. Warszawska 6/32</p>
-                <p className="text-xs text-zinc-500 font-medium mt-0.5">15-063 Białystok</p>
+                <p className="text-sm font-bold text-zinc-900">ul. Piękna 5/2</p>
+                <p className="text-xs text-zinc-500 font-medium mt-0.5">15-282 Białystok</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -251,10 +251,10 @@ export default function AboutPage() {
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Telefon</p>
                 <a
-                  href="tel:+48699606351"
+                  href="tel:+48510510018"
                   className="text-sm font-bold text-zinc-900 hover:text-[#e85d04] transition-colors"
                 >
-                  699 606 351
+                  510 510 018
                 </a>
               </div>
             </div>
