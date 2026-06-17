@@ -75,7 +75,7 @@
     "wartoscPojazdu": 92187
   },
   "-volkswagen-arteon-14079": {
-    "wartoscPojazdu": 94518
+    "wartoscPojazdu": 90061
   },
   "hyundai-elantra-18319": {
     "wartoscPojazdu": 94518
@@ -199,5 +199,41 @@
   },
   "bmw-series-3-18418": {
     "wartoscPojazdu": 70294
+  },
+  "skoda-rapid---ii-18384": {
+    "wartoscPojazdu": 57846
+  },
+  "opel-combo---d-10411": {
+    "wartoscPojazdu": 36510
+  },
+  "citroen-c3---ii-18357": {
+    "wartoscPojazdu": 32138
+  },
+  "skoda-fabia---iii-10714": {
+    "wartoscPojazdu": 51403
+  },
+  "citroen-c4-spacetourer-13135": {
+    "wartoscPojazdu": 58283
+  },
+  "skoda-octavia---iii-fl-11121": {
+    "wartoscPojazdu": 57846
+  },
+  "opel-insignia---ii-18229": {
+    "wartoscPojazdu": 80324
+  },
+  "skoda-superb---iii-18297": {
+    "wartoscPojazdu": 92187
+  },
+  "hyundai-elantra---vii-18319": {
+    "wartoscPojazdu": 94518
+  },
+  "skoda-superb---iii-18141": {
+    "wartoscPojazdu": 94518
+  },
+  "ford-transit---viii-18220": {
+    "wartoscPojazdu": 96067
+  },
+  "skoda-superb---iii-13395": {
+    "wartoscPojazdu": 80324
   }
 }
