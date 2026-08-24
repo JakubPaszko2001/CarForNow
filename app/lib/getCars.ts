@@ -33,15 +33,18 @@ export async function getScrapedCars() {
       const rokRaw = liTexts[4] || '';
       const rok = parseInt(rokRaw.match(/\d{4}/)?.[0] || '2023');
 
+      // LINK
+      const rawLink = $(el).find('header a').first().attr('href') || '';
+      const link = rawLink.replace('../auto/', '/auto/').replace(/\/$/, '');
+
       // CENA
       const cenaRaw = $(el).find('strong').filter((_, e) =>
         $(e).find('small').length > 0
       ).first().text().replace(/[^\d.]/g, '');
       const price = parseFloat(cenaRaw) || 0;
 
-      // LINK
-      const rawLink = $(el).find('header a').first().attr('href') || '';
-      const link = rawLink.replace('../auto/', '/auto/').replace(/\/$/, '');
+      // POMIŃ NIEPEŁNE/BŁĘDNE OFERTY (np. brak ceny = 0 zł)
+      if (price <= 0) return;
 
       cars.push({
         brand: brand || 'Auto',
