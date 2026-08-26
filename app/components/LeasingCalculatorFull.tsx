@@ -1,4 +1,4 @@
-"use client";
+  "use client";
 
 import { useMemo, useState } from "react";
 
@@ -209,41 +209,51 @@ export default function LeasingCalculatorFull() {
       {/* RESULTS */}
       <div className="lg:col-span-7">
         <div className="bg-[#1a1a1a] rounded-3xl border border-white/10 overflow-hidden h-full flex flex-col">
-          <div className="px-7 py-6 border-b border-white/10">
+                    <div className="px-7 py-6 border-b border-white/10">
             <h3 className="text-xl font-black text-white uppercase tracking-tight">
-              Symulacja rat
+              Symulacja Rat
             </h3>
             <p className="text-sm text-zinc-400 font-medium mt-1">
-              Orientacyjna wysokość raty miesięcznej (brutto).
+              Poniżej przedstawiamy orientacyjną wysokość raty miesięcznej.
             </p>
           </div>
 
-          <div className="flex-grow p-6">
-            <div className="divide-y divide-white/5">
-              {calc.rates.map(({ months, value }) => (
-                <div
-                  key={months}
-                  className="flex items-center justify-between py-3 px-2 hover:bg-white/5 rounded-xl transition-colors"
-                >
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-black text-white">
-                      {months}
-                    </span>
-                    <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">
-                      miesięcy
-                    </span>
-                  </div>
-                  <span className="text-2xl md:text-3xl font-black text-[#e85d04] tracking-tight">
-                    {formatCurrency(value)}
-                  </span>
-                </div>
-              ))}
-            </div>
+          <div className="flex-grow p-0">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="px-7 py-3 text-left text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                    Okres
+                  </th>
+                  <th className="px-7 py-3 text-right text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                    Rata miesięczna (brutto)*
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {calc.rates.map(({ months, value }) => (
+                  <tr key={months} className="hover:bg-white/5 transition-colors">
+                    <td className="px-7 py-3">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-black text-white">
+                          {months}
+                        </span>
+                        <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">
+                          miesięcy
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-7 py-3 text-right text-2xl md:text-3xl font-black text-[#e85d04] tracking-tight">
+                      {formatCurrency(value)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
-          <div className="bg-black/40 px-6 py-3 border-t border-white/10 text-center text-[11px] text-zinc-500 font-medium">
-            * Przedstawiona kalkulacja ma charakter orientacyjny i nie zawiera
-            kosztu ubezpieczenia.
+                    <div className="bg-black/40 px-6 py-3 border-t border-white/10 text-center text-[11px] text-zinc-500 font-medium">
+            * Przedstawiona kalkulacja ma charakter orientacyjny.
           </div>
         </div>
       </div>

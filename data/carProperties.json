@@ -247,5 +247,152 @@
   },
   "opel-meriva-18243": {
     "wartoscPojazdu": 34348
+  },
+  "audi-s6---c8-10380": {
+    "wartoscPojazdu": 200369
+  },
+  "fiat-500-10098": {
+    "wartoscPojazdu": 51955
+  },
+  "ford-mondeo-9610": {
+    "wartoscPojazdu": 57889
+  },
+  "renault-clio-9378": {
+    "wartoscPojazdu": 34660
+  },
+  "skoda-octavia-11415": {
+    "wartoscPojazdu": 60849
+  },
+  "ford-focus-10539": {
+    "wartoscPojazdu": 79493
+  },
+  "seat-arona-13865": {
+    "wartoscPojazdu": 58283
+  },
+  "toyota-corolla-14070": {
+    "wartoscPojazdu": 79593
+  },
+  "opel-astra-14170": {
+    "wartoscPojazdu": 68354
+  },
+  "kia-ceed-15829": {
+    "wartoscPojazdu": 78927
+  },
+  "skoda-rapid-15912": {
+    "wartoscPojazdu": 31540
+  },
+  "skoda-superb-16028": {
+    "wartoscPojazdu": 94518
+  },
+  "ford-transit-custom-17059": {
+    "wartoscPojazdu": 102802
+  },
+  "ford-mondeo-16173": {
+    "wartoscPojazdu": 47178
+  },
+  "ford-mondeo-16545": {
+    "wartoscPojazdu": 73426
+  },
+  "mercedes-a45s-18182": {
+    "wartoscPojazdu": 156933
+  },
+  "ford-tourneo-courier-17701": {
+    "wartoscPojazdu": 57115
+  },
+  "volkswagen-t-roc-18162": {
+    "wartoscPojazdu": 82596
+  },
+  "audi-rs-q3-18188": {
+    "wartoscPojazdu": 199085
+  },
+  "mercedes-cla---c118-18239": {
+    "wartoscPojazdu": 213184
+  },
+  "volvo-s80-18256": {
+    "wartoscPojazdu": 34019
+  },
+  "hyundai-bayon-18317": {
+    "wartoscPojazdu": 78047
+  },
+  "kia-ceed---iii-18299": {
+    "wartoscPojazdu": 76145
+  },
+  "hyundai-tucson-18281": {
+    "wartoscPojazdu": 124550
+  },
+  "hyundai-i30-18327": {
+    "wartoscPojazdu": 74743
+  },
+  "mercedes-cla---c118-18343": {
+    "wartoscPojazdu": 213184
+  },
+  "skoda-octavia-18342": {
+    "wartoscPojazdu": 84055
+  },
+  "mercedes-c-klasa---w205-fl-18390": {
+    "wartoscPojazdu": 116996
+  },
+  "mercedes-s-klasa---w222-18405": {
+    "wartoscPojazdu": 179841
+  },
+  "hyundai-i30---iii-18411": {
+    "wartoscPojazdu": 76591
+  },
+  "hyundai-i30---iii-18412": {
+    "wartoscPojazdu": 67438
+  },
+  "ford-focus-18432": {
+    "wartoscPojazdu": 37307
+  },
+  "citroen-c3-18424": {
+    "wartoscPojazdu": 42868
+  },
+  "ford-focus---iv-18437": {
+    "wartoscPojazdu": 46607
+  },
+  "ford-focus---iv-18435": {
+    "wartoscPojazdu": 57115
+  },
+  "ford-focus---iv-18438": {
+    "wartoscPojazdu": 56815
+  },
+  "ford-focus---iv-18439": {
+    "wartoscPojazdu": 53813
+  },
+  "renault-clio---iv-18441": {
+    "wartoscPojazdu": 38362
+  },
+  "renault-clio---iv-18440": {
+    "wartoscPojazdu": 38362
+  },
+  "kia-cee'd-18455": {
+    "wartoscPojazdu": 61432
+  },
+  "seat-leon-18467": {
+    "wartoscPojazdu": 48691
+  },
+  "subaru-forester-18458": {
+    "wartoscPojazdu": 49321
+  },
+  "volvo-v60-18468": {
+    "wartoscPojazdu": 36665
+  },
+  "alfa-romeo-stelvio-18476": {
+    "wartoscPojazdu": 109236
+  },
+  "peugeot-508-18483": {
+    "wartoscPojazdu": 86329
+  },
+  "bmw-series-3-(320i)-18485": {
+    "wartoscPojazdu": 93064
+  },
+  "renault-austral-18491": {
+    "wartoscPojazdu": 112539
+  },
+  "cupra-ateca-18492": {
+    "wartoscPojazdu": 115542
+  },
+  "bmw-x3-18493": {
+    "wartoscPojazdu": 140923
   }
 }
