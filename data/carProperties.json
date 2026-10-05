@@ -237,7 +237,7 @@
     "wartoscPojazdu": 80324
   },
   "renault-kangoo-8572": {
-    "wartoscPojazdu": 30988
+    "wartoscPojazdu": 33492
   },
   "fiat-tipo-7561": {
     "wartoscPojazdu": 53813
@@ -252,7 +252,7 @@
     "wartoscPojazdu": 200369
   },
   "fiat-500-10098": {
-    "wartoscPojazdu": 51955
+    "wartoscPojazdu": 45687
   },
   "ford-mondeo-9610": {
     "wartoscPojazdu": 57889
@@ -394,5 +394,11 @@
   },
   "bmw-x3-18493": {
     "wartoscPojazdu": 140923
+  },
+  "seat-arona-9838": {
+    "wartoscPojazdu": 46897
+  },
+  "renault-megane-10526": {
+    "wartoscPojazdu": 51403
   }
 }

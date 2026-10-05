@@ -246,7 +246,7 @@ export default function AboutPage() {
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Firma</p>
                 <p className="text-sm font-bold text-zinc-900">CFY SPÓŁKA AKCYJNA</p>
-                <p className="text-xs text-zinc-500 font-medium mt-0.5">NIP: 9662156965</p>
+                <p className="text-xs text-zinc-500 font-medium mt-0.5">NIP: 9662154965</p>
               </div>
             </div>
             <div className="flex items-start gap-4">

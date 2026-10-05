@@ -116,7 +116,7 @@ export default function RootLayout({
               description:
                 "Wynajem długoterminowy samochodów z opcją wykupu. Bez BIK, bez zaświadczeń o zarobkach.",
               telephone: "+48510510018",
-              taxID: "9662156965",
+              taxID: "9662154965",
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "ul. Piękna 5/2",
